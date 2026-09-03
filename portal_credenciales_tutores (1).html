@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Portal de Credenciales · LMS Tutores</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --sky-100:#eef8fc;
+    --sky-200:#d7eff9;
+    --sky-300:#aee0f2;
+    --sky-400:#6cc6e6;
+    --sky-500:#2fa9d6;
+    --sky-600:#1c86b3;
+    --ink-900:#0e3348;
+    --ink-700:#215878;
+    --ink-500:#4d7b95;
+    --paper:#fbfeff;
+    --good:#1f9d6e;
+    --warn:#c96a2e;
+    --shadow: 0 20px 50px -18px rgba(14,51,72,0.28);
+    --radius-lg: 22px;
+    --radius-sm: 12px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    min-height:100vh;
+    font-family:'Manrope', system-ui, sans-serif;
+    color:var(--ink-900);
+    background:
+      radial-gradient(1100px 600px at 12% -10%, #ffffff 0%, transparent 55%),
+      radial-gradient(900px 700px at 100% 0%, var(--sky-300) 0%, transparent 45%),
+      linear-gradient(160deg, var(--sky-100) 0%, var(--sky-200) 45%, var(--sky-300) 100%);
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    padding:56px 20px 80px;
+    position:relative;
+    overflow-x:hidden;
+  }
+
+  /* soft drifting cloud shapes */
+  .cloud{
+    position:absolute;
+    border-radius:50%;
+    filter:blur(2px);
+    background: radial-gradient(circle at 30% 30%, #ffffff, #ffffffcc 60%, transparent 75%);
+    opacity:.7;
+    pointer-events:none;
+  }
+  .cloud.c1{ width:260px; height:110px; top:6%; left:-4%; animation: drift 46s linear infinite; }
+  .cloud.c2{ width:180px; height:80px; top:16%; right:-3%; animation: drift 60s linear infinite reverse; }
+  .cloud.c3{ width:130px; height:60px; bottom:8%; left:6%; animation: drift 52s linear infinite; opacity:.5;}
+  @keyframes drift{
+    0%{ transform: translateX(0) translateY(0); }
+    50%{ transform: translateX(24px) translateY(-10px); }
+    100%{ transform: translateX(0) translateY(0); }
+  }
+  @media (prefers-reduced-motion: reduce){
+    .cloud{ animation:none !important; }
+  }
+
+  header{
+    text-align:center;
+    max-width:640px;
+    margin-bottom:38px;
+    position:relative;
+    z-index:2;
+  }
+  .eyebrow-mark{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    background:rgba(255,255,255,0.6);
+    border:1px solid var(--sky-300);
+    padding:6px 14px;
+    border-radius:999px;
+    font-size:13px;
+    color:var(--ink-700);
+    font-weight:600;
+    margin-bottom:20px;
+  }
+  .eyebrow-mark svg{ width:16px; height:16px; }
+  h1{
+    font-family:'Fraunces', serif;
+    font-weight:600;
+    font-size:clamp(32px, 5vw, 46px);
+    line-height:1.1;
+    margin:0 0 14px;
+    color:var(--ink-900);
+    letter-spacing:-0.01em;
+  }
+  header p{
+    font-size:16px;
+    color:var(--ink-700);
+    line-height:1.55;
+    margin:0;
+  }
+
+  main{
+    width:100%;
+    max-width:560px;
+    position:relative;
+    z-index:2;
+  }
+
+  .search-card{
+    background:var(--paper);
+    border-radius:var(--radius-lg);
+    box-shadow:var(--shadow);
+    border:1px solid #ffffff;
+    padding:32px;
+    position:relative;
+  }
+  .search-card::before{
+    content:"";
+    position:absolute;
+    inset:0;
+    border-radius:var(--radius-lg);
+    padding:1px;
+    background:linear-gradient(135deg, var(--sky-400), transparent 40%);
+    -webkit-mask:linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite:xor;
+    mask-composite:exclude;
+    pointer-events:none;
+    opacity:.6;
+  }
+
+  label{
+    display:block;
+    font-size:13px;
+    font-weight:700;
+    color:var(--ink-700);
+    margin-bottom:9px;
+  }
+
+  .input-row{
+    display:flex;
+    gap:10px;
+  }
+  input#teacherId{
+    flex:1;
+    font-family:'Manrope', sans-serif;
+    font-size:20px;
+    font-weight:700;
+    letter-spacing:0.02em;
+    padding:14px 16px;
+    border-radius:var(--radius-sm);
+    border:2px solid var(--sky-300);
+    background:var(--sky-100);
+    color:var(--ink-900);
+    outline:none;
+    transition: border-color .18s ease, background .18s ease, box-shadow .18s ease;
+  }
+  input#teacherId::placeholder{
+    color:#8fb4c7;
+    font-weight:600;
+  }
+  input#teacherId:focus{
+    border-color:var(--sky-500);
+    background:#ffffff;
+    box-shadow:0 0 0 4px rgba(47,169,214,0.18);
+  }
+  input#teacherId.shake{
+    animation: shake .4s ease;
+    border-color:var(--warn);
+  }
+  @keyframes shake{
+    10%,90%{ transform: translateX(-2px); }
+    20%,80%{ transform: translateX(4px); }
+    30%,50%,70%{ transform: translateX(-7px); }
+    40%,60%{ transform: translateX(7px); }
+  }
+
+  button#searchBtn{
+    font-family:'Manrope', sans-serif;
+    font-weight:700;
+    font-size:16px;
+    color:#fff;
+    background:linear-gradient(135deg, var(--sky-500), var(--sky-600));
+    border:none;
+    border-radius:var(--radius-sm);
+    padding:0 26px;
+    cursor:pointer;
+    box-shadow:0 10px 22px -8px rgba(28,134,179,0.55);
+    transition: transform .15s ease, box-shadow .15s ease, filter .15s ease;
+  }
+  button#searchBtn:hover{ filter:brightness(1.05); transform:translateY(-1px); }
+  button#searchBtn:active{ transform:translateY(0px) scale(0.98); }
+
+  .hint{
+    margin-top:12px;
+    font-size:13px;
+    color:var(--ink-500);
+  }
+
+  #feedback{
+    margin-top:10px;
+    font-size:14px;
+    font-weight:600;
+    color:var(--warn);
+    min-height:18px;
+  }
+
+  .gate-feedback{
+    margin-top:10px;
+    font-size:14px;
+    font-weight:600;
+    color:var(--warn);
+    min-height:18px;
+  }
+  #gatePassword{
+    font-size:17px;
+  }
+  .fade-in{
+    animation: fadeIn .35s ease;
+  }
+  @keyframes fadeIn{
+    from{ opacity:0; transform:translateY(6px); }
+    to{ opacity:1; transform:translateY(0); }
+  }
+
+  /* Result panel */
+  #result{
+    margin-top:26px;
+    display:none;
+  }
+  .result-card{
+    background:linear-gradient(180deg, #ffffff 0%, var(--sky-100) 100%);
+    border-radius:var(--radius-lg);
+    box-shadow:var(--shadow);
+    padding:0;
+    overflow:hidden;
+    border:1px solid var(--sky-200);
+  }
+  .result-head{
+    background:linear-gradient(120deg, var(--ink-900), var(--sky-600));
+    color:#fff;
+    padding:24px 28px;
+    display:flex;
+    align-items:center;
+    gap:16px;
+  }
+  .avatar-badge{
+    width:52px;
+    height:52px;
+    border-radius:50%;
+    background:rgba(255,255,255,0.16);
+    border:1.5px solid rgba(255,255,255,0.5);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-family:'Fraunces', serif;
+    font-size:20px;
+    font-weight:600;
+    flex-shrink:0;
+  }
+  .result-head .who{ min-width:0; }
+  .result-head h2{
+    font-family:'Fraunces', serif;
+    font-weight:600;
+    font-size:22px;
+    margin:0 0 4px;
+    line-height:1.2;
+    overflow-wrap:anywhere;
+  }
+  .result-head .branch-line{
+    font-size:13px;
+    opacity:.85;
+    font-weight:600;
+    letter-spacing:.02em;
+  }
+
+  .status-pill{
+    margin-left:auto;
+    flex-shrink:0;
+    background:rgba(255,255,255,0.18);
+    border:1px solid rgba(255,255,255,0.5);
+    padding:6px 12px;
+    border-radius:999px;
+    font-size:12px;
+    font-weight:700;
+    display:flex;
+    align-items:center;
+    gap:6px;
+    white-space:nowrap;
+  }
+  .status-pill .dot{
+    width:7px; height:7px; border-radius:50%;
+    background:#7CF2B0;
+    box-shadow:0 0 0 3px rgba(124,242,176,0.3);
+  }
+
+  .field-list{
+    padding:22px 28px 26px;
+    display:flex;
+    flex-direction:column;
+    gap:16px;
+  }
+  .field{
+    display:flex;
+    flex-direction:column;
+    gap:5px;
+  }
+  .field .k{
+    font-size:12px;
+    font-weight:700;
+    color:var(--sky-600);
+  }
+  .field .v-row{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    background:var(--sky-100);
+    border:1px solid var(--sky-200);
+    border-radius:10px;
+    padding:11px 14px;
+  }
+  .field .v{
+    font-size:15.5px;
+    font-weight:600;
+    color:var(--ink-900);
+    word-break:break-all;
+    flex:1;
+    font-variant-ligatures:none;
+  }
+  .field.pw .v{ font-family:'DM Mono','Menlo',monospace; letter-spacing:.02em; }
+
+  .copy-btn{
+    background:#fff;
+    border:1px solid var(--sky-300);
+    color:var(--sky-600);
+    width:32px;
+    height:32px;
+    border-radius:8px;
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    flex-shrink:0;
+    transition: background .15s ease, transform .1s ease;
+  }
+  .copy-btn:hover{ background:var(--sky-200); }
+  .copy-btn:active{ transform:scale(0.92); }
+  .copy-btn svg{ width:15px; height:15px; }
+  .copy-btn.copied{ color:var(--good); border-color:var(--good); }
+
+  .eye-btn{
+    background:#fff;
+    border:1px solid var(--sky-300);
+    color:var(--sky-600);
+    width:32px;
+    height:32px;
+    border-radius:8px;
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    flex-shrink:0;
+  }
+  .eye-btn svg{ width:16px; height:16px; }
+
+  .id-tag{
+    font-size:12px;
+    font-weight:700;
+    color:var(--ink-500);
+    background:#fff;
+    border:1px solid var(--sky-200);
+    padding:5px 10px;
+    border-radius:8px;
+  }
+
+  footer{
+    margin-top:34px;
+    font-size:12.5px;
+    color:var(--ink-500);
+    text-align:center;
+    max-width:480px;
+    position:relative;
+    z-index:2;
+    line-height:1.6;
+  }
+
+  /* empty state */
+  #emptyState{
+    margin-top:26px;
+    text-align:center;
+    color:var(--ink-500);
+    font-size:14px;
+    display:none;
+    background:rgba(255,255,255,0.5);
+    border:1px dashed var(--sky-300);
+    border-radius:var(--radius-lg);
+    padding:26px;
+  }
+
+  @media (max-width:480px){
+    .search-card{ padding:24px 20px; }
+    .input-row{ flex-direction:column; }
+    button#searchBtn{ padding:14px; }
+    .result-head{ flex-wrap:wrap; }
+    .status-pill{ margin-left:0; }
+  }
+</style>
+</head>
+<body>
+
+<div class="cloud c1"></div>
+<div class="cloud c2"></div>
+<div class="cloud c3"></div>
+
+<header id="gateHeader">
+  <span class="eyebrow-mark">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3 7h7l-5.5 4.5L18.5 21 12 16.5 5.5 21l2-7.5L2 9h7z"/></svg>
+    LMS · Kodland
+  </span>
+  <h1>Acceso de tutores</h1>
+  <p>Este portal es solo para el equipo de Kodland. Ingresa la clave de acceso que te compartió tu coordinador.</p>
+</header>
+
+<header id="searchHeader" style="display:none;">
+  <span class="eyebrow-mark">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3 7h7l-5.5 4.5L18.5 21 12 16.5 5.5 21l2-7.5L2 9h7z"/></svg>
+    LMS · Kodland
+  </span>
+  <h1>Encuentra tus credenciales</h1>
+  <p>Escribe tu contraseña personal y te mostramos tu nombre, correo y contraseña de acceso al instante.</p>
+</header>
+
+<main>
+  <div class="search-card" id="gateCard">
+    <label for="gatePassword">Clave de acceso</label>
+    <div class="input-row">
+      <input id="gatePassword" type="password" placeholder="Clave de acceso" autocomplete="off" />
+      <button id="gateBtn">Entrar</button>
+    </div>
+    <div class="hint">Uso exclusivo del equipo interno de Kodland.</div>
+    <div id="gateFeedback" class="gate-feedback"></div>
+  </div>
+
+  <div class="search-card" id="searchCard" style="display:none;">
+    <label for="teacherId">Tu contraseña personal</label>
+    <div class="input-row">
+      <input id="teacherId" type="password" placeholder="Ej. R6yew" autocomplete="off" />
+      <button id="searchBtn">Buscar</button>
+    </div>
+    <div class="hint">Es la contraseña que te asignó tu coordinador, no tu Teacher ID.</div>
+    <div id="feedback"></div>
+  </div>
+
+  <div id="result"></div>
+  <div id="emptyState">
+    <strong>No encontramos esa contraseña.</strong><br>
+    Verifica que esté completa, respetando mayúsculas y minúsculas, o contacta a tu coordinador.
+  </div>
+</main>
+
+<footer>
+  Portal interno de autoconsulta de credenciales &middot; La información mostrada es personal y confidencial. No compartas tu contraseña con nadie.
+</footer>
+
+<script>
+  const DATA = [["R6yew","314521","","Alejandra Molina","","",""],["Dzsm2","649750","LATAM","Andrés Mendoza","a.rodriguez@kodland.team","9ld92vKpmcsG","создан"],["2Wqmw","329444","LATAM","Aron Ibañez","a.ibanez@kodland.team","Xo8bO6ihPwlk","создан"],["XznWa","631547","","Diego Vasquez","","",""],["7LkWd","543211","LATAM","Franco Barrionuevo","f.barrionuevo@kodland.team","TlfYUO77g3c7","создан"],["ZyDLB","558469","LATAM","Lorenz Pulgar","l.velasquez@kodland.team","w7tl7hhkkSfV","создан"],["xOw9U","692474","LATAM","Juan Solano","j.torres1@kodland.team","5IHX5Fo9pfKW","создан"],["URXhX","718386","","Alexandra Toro","","",""],["l3cCP","778303","","Alejandro Sossa","","",""],["u0wQX","828349","","Germán Moreno","","",""],["mn93C","863803","LATAM","Jonathan Burbano","j.pazos@kodland.team","5POah3nUOMbr","создан"],["OhPZq","874060","","Yissell Arciniegas","","",""],["fT0ag","900726","LATAM","Myle Urdaneta","e.urfaneta.cordoba@kodland.team","5kxp7C04xkXQ","создан"],["xIOdf","900732","","Yasser Torres","","",""],["iSJIf","921122","LATAM","Daniel Zapata","d.zapata.botina@kodland.team","euFKeNolf68W","создан"],["PiY3C","942687","LATAM","Malorys Elles","m.fang@kodland.team","0G4V7uuNv0KW","создан"],["P9BJE","972325","LATAM","David Chamorro","david.chamorro@kodland.team","8USw0nrKsyTs","создан"],["n99o9","981152","LATAM","Ehimar Vargas","e.vargas.malaver@kodland.team","sONuojnwXCSL","создан"],["zJXmy","981156","LATAM","José Francisco Cabarcas","j.cabarcas@kodland.team","KFKQrqE3b57i","создан"],["AgYtT","986697","","Daniel Barrios","","",""],["dSvse","1007788","LATAM","Gabriel Hoyos","g.gomez.casseres@kodland.team","W6HIpQG8n81m","создан"],["mNGEf","1860565","","Laura Sofía Velasquez","","",""],["5NV7J","1034300","","Airton Jairo Sampayo","","",""],["gNx7M","1039637","LATAM","Harold Armando Rocha","h.rocha.sanchez@kodland.team","GeLvWYZ67fid","создан"],["NPo0Q","1054195","LATAM","Miguel Ángel Flórez","miguelflorez.pulido@kodland.team","JdQZRIimNEjC","создан"],["6IJYh","1057120","LATAM","Patricia Gutiérrez","l.gutierrez.zuniga@kodland.team","O6fNskpuKMLF","создан"],["wGZ8B","1057130","LATAM","Ivan Mallama","i.mallama.coral@kodland.team","kRkd4DDkaLRe","создан"],["07dmX","1067748","","Alexsandra Ortiz","","",""],["nlMgA","1078128","LATAM","Zirley Rivera","zirley.rivera@kodland.team","6lgoalEjLLpI","создан"],["uNB7u","1100370","LATAM","Camilo Bermudez","c.bermudez@kodland.team","xcF5db8hl24K","создан"],["nbpmg","1098315","LATAM","Ismael Cajar","i.cajar@kodland.team","O8cTqR1TmCMS","создан"],["9KkEG","1098323","LATAM","Manuela Rodríguez","m.moreno@kodland.team","xdG9YTvzoj00","создан"],["uzDvJ","1107522","LATAM","Camilo Builes","juan.lemus@kodland.team","2jrMs0syaJ2T","создан"],["zH6G5","1107530","LATAM","Arturo Galeano","c.arturo.galeano.pareja4@kodland.team","cdl4lq98LC1A","создан"],["brtAj","1122016","LATAM","Johanna Rios","johanna.rios@kodland.team","sFbE1FYnOSp5","создан"],["tgVKt","1122021","LATAM","Jaime Narvaez","jhon.ortiznarvaez@kodland.team","CatqHFUc0mUN","создан"],["HBBxw","1122023","LATAM","Vanessa Sarmiento","v.osorio@kodland.team","VlIUyAVU8j6x","создан"],["vC5OI","1131775","LATAM","César Plazas","cesar.plaza@kodland.team","ZJ6H6Y1csTzH","создан"],["pjACz","1131779","","Christian Becerra","","",""],["9BW3r","1138699","LATAM","Sofia Boada","k.cagua@kodland.team","9cdx44HWqLDD","создан"],["NCMvJ","1141195","","Jhon Delgado","","",""],["EITt5","1144176","LATAM","Pablo Muñoz","p.munoz.gomez@kodland.team","XkFd2e4bvaPb","создан"],["2mUJr","1155222","LATAM","Dainer De Jesús Quiroz Muñoz","dainer.quiroz@kodland.team","JscMCfslU3ci","создан"],["6r7ko","1168196","LATAM","Camilo Ferreira","j.ferreira47@kodland.team","OiX3kRb9WruY","создан"],["wSrJP","1168217","","Josept Buitrago","","",""],["B0Edg","1185245","","Carolina Delgado","","",""],["DMG8Z","1188944","LATAM","Stefanía Bolaños","l.bolanos.narvaez@kodland.team","17EvKfJ3moDq","создан"],["BIoZm","1191994","LATAM","Claudia Santos","c.santos.gutierrez@kodland.team","aB59Kj8Q4V3j","создан"],["1mGMx","1198495","","Maria Ortiz","","",""],["BBd6p","1198499","","Santiago Duque","","",""],["wkq0Z","1203387","LATAM","Hugo Monederos","v.mejia74@kodland.team","1WzctkdocEQC","создан"],["w0foZ","1238194","LATAM","Kevin López","k.lopez.quiroz@kodland.team","37mE82qaNJjw","создан"],["lfHu4","1238204","","Daniela Villanova","","",""],["9nfIg","1238207","LATAM","Yeisson Fajardo","y.fajardo.pena@kodland.team","DE3mJ2Emx6iB","создан"],["XgjxA","1238210","","Steven Poveda","","",""],["egFpM","1238217","LATAM","Alejandra Forero","alejandra.forero@kodland.team","A68gsuqWrc4h","создан"],["qgnjF","1255281","LATAM","Paola Carrillo","l.carrillo.morelo@kodland.team","scu6SF7UCwcF","создан"],["OV3Ij","1258610","LATAM","Lisbeth Fernández","l.pinzon.fernandez@kodland.team","nj0N0Rz0B1NM","создан"],["bezS9","1262182","LATAM","Victor Cárdenas","victormanuel.romero@kodland.team","8WOhGSTAkBwV","создан"],["RlxMt","1298067","LATAM","Nayib Bustos","einarmoreno.bustos@kodland.team","gJhaqnRMvzJm","создан"],["jIpHv","1326032","LATAM","Lorena Sanchez","lorena.sanchez.gamba@kodland.team","ssai9rK3vlbK","создан"],["vbBrI","1332104","","Esther Huillca","","",""],["UGpVk","1332128","","Beker Arias","","",""],["XGUSu","1346484","LATAM","Sebastian Contreras","v.juan.sebastian@kodland.team","iZDK4ajyHEhU","создан"],["sOfW8","1346506","LATAM","Eden Palli Livisi","eden.palli.livisi@kodland.team","EcKkc2IQYDVu","создан"],["LLTZ1","1347915","LATAM","Jeison Chilo","f.jeison.steven@kodland.team","7brEnlmEd4gp","создан"],["5YWvZ","1347919","LATAM","Mariano Ruiz","ruiz.mariano@kodland.team","o9adgNaiNr1P","создан"],["Q7SVx","1347959","","Alejandra Urzagasti","","",""],["Kd2pl","1358117","LATAM","Yanet Moreno","m.irma.yanet@kodland.team","t7Q0CUPdk0uw","создан"],["vAzAs","1364908","LATAM","Jael Mamani","m.debora.jael65@kodland.team","h2toxjG3AabY","создан"],["fZYZ7","1375464","LATAM","Yeferson Soler","andres.erazo@kodland.team","cJWdHtxU2bah","создан"],["iMMmy","1375834","LATAM","Melisa Manios","m.manios.cuellar5@kodland.team","iPaA0uD24Twz","создан"],["rVzVa","1375842","LATAM","Nahuel Chuquiruna","cristian.chuquiruna@kodland.team","7Mm10xkj5TPU","создан"],["Ywz1H","1375854","","Angelo Gaviria","","",""],["gTchP","1377113","LATAM","Nicolás Garcia","nicolas.garcia.gonzalez@kodland.team","4NZEkT7CjXhY","создан"],["BHrLd","1377131","LATAM","Jorge Espejo","p.jorge.andres@kodland.team","nZCdrmcreGm1","создан"],["3azXr","1380018","","Cristian Ariel","","",""],["Sbw13","1386568","","Julián Montes","","",""],["a5k03","1404903","","Elizabeth Escalona","","",""],["fvsMI","1402519","LATAM","Sergio Meza","sergio.meza@kodland.team","4Fi7JOl3j6Pi","создан"],["BRXBD","1404912","LATAM","Santiago Espinosa","s.espinosa.otalvaro@kodland.team","2XsiFJLU8m39","создан"],["UpY39","1404915","LATAM","Karol Perdomo","karoltatiana.bocanegra@kodland.team","QaCn0Jgd3uYT","создан"],["0x40l","1421074","","Nadia Soledad","","",""],["OcFTX","1426906","","Ana Alvarado","","",""],["sBS23","1439826","","Andrea Veloza","","",""],["L1xka","1432146","LATAM","Sneider Beltran","castro.duvan.sneider@kodland.team","ecCbBwH89Wso","создан"],["aFAPb","1429026","LATAM","Eduardo Mendivelso","lmendivelso.suarez@kodland.team","RNzCeDl2unCw","создан"],["qg4ZE","1431463","LATAM","Sebastian Zuluaga","juan.zuluaga.mejia@kodland.team","fFqfo6uf39yg","создан"],["GaRDh","1439913","LATAM","Edxon Herrera","edxon.herrera@kodland.team","4muYTNepyLBJ","создан"],["wRgQz","1451493","LATAM","Eder Zambrano","e.johan.zambrano.perez@kodland.team","oMdZuZcEJ4A5","создан"],["KJRTP","1442885","","Dorelys Martinez","","",""],["vl9ns","1470993","","Dylan Giuseppe Rivera","","",""],["2qNKL","1471774","LATAM","Nicole Ramirez","nicole.ramirez.patino@kodland.team","BxdK4fv5ObVD","создан"],["8lrkm","1471776","LATAM","Nelson Alvarez","n.ivan.alvarez.suarez@kodland.team","xFT4zvVWQsft","создан"],["OjnbN","1471371","LATAM","Laura Valentina Bautista","l.valentina.bautista.poveda@kodland.team","BfL3Xitok4ni","создан"],["jkPzh","1471770","","Jhoan Saldarriaga","","",""],["o0Ag9","1471790","LATAM","Nicole Ospina","n.ospina@kodland.team","9NJSNxXIpd6j","создан"],["DLLDm","1471791","LATAM","Diana Carolina Serrano","d.carolina.serrano.tovar@kodland.team","KvHrpUc5fxa6","создан"],["x0Zwa","1471068","LATAM","Angie Sofía López","a.lopez@kodland.team","rvaS4cu0HaVv","создан"],["fmAGB","1471799","LATAM","Martina Curiotto","martina.curiotto@kodland.team","RmVyYllnE5Oe","создан"],["WlhmG","1479124","","Lucrecia Ramirez","","",""],["cntix","1476303","","Felipe Garzón","","",""],["ZmTSt","1479142","","Daniel Epia","","",""],["qnpWp","1479146","","Andrea Pérez","","",""],["tNpc4","1499918","","Saray Yepes","","",""],["ehesc","1495493","LATAM","Juan Araujo","juan.araujo@kodland.team","RQriCDVhBKbe","создан"],["svReN","1511354","LATAM","Alejandra Moreno","mariamoreno.ramirez@kodland.team","HNNzQ22JjTh7","создан"],["YXUxN","1525505","LATAM","María José Castañeda","maria.castaneda.grajales@kodland.team","4lQibfFeBhHM","создан"],["tjRJx","1512623","LATAM","Berenice Castaño","y.castano.justinico@kodland.team","7Os0eyrtkBH8","создан"],["ICBhF","1520221","LATAM","Diego Parada","j.parada@kodland.team","KzXd5iDbHkmF","создан"],["oT2av","1504124","LATAM","César Andrés Navarro","c.andres.navarro.acosta@kodland.team","5mbRe4MbbZiL","создан"],["CkIL4","1515263","LATAM","Felipe Diaz","daniel.diaz.rodriguez@kodland.team","vKSIIiW3Xb54","создан"],["BQw41","1525513","","Leonardo Triana","","",""],["L96Ai","1520064","","Marcela Pinzon","","",""],["dSf0c","1526097","","David Reyes","","",""],["2QXj0","1531860","","Nilson Beltrán","","",""],["Sj4JN","1532528","LATAM","Isabella Cuesta","isabella.cuesta@kodland.team","BrXAuFmmsbRp","создан"],["3gxG6","1552010","LATAM","Jeffer Simanca","j.armando.simaca.palomino@kodland.team","oXkV554II96I","создан"],["dZBv3","1550830","LATAM","Alejandra Amaya","m.segura@kodland.team","RAQSMZSKsh6K","создан"],["0ItrT","1565960","LATAM","Andrés García","juangarcia.giraldo@kodland.team","mTQfq2J5lz5N","создан"],["4XC4O","1565995","LATAM","Alfredo Páez","carlos.mendoza.paez@kodland.team","SXoTfF2BDgte","создан"],["3uf2t","1565966","","Natalia Bayona","","",""],["zoA7g","1579877","LATAM","Maryuris Bossio","maryuris.maria.bossio.castro@kodland.team","NFXSaTwkKcXX","создан"],["KHfoM","1579879","","Federico Cordoba","","",""],["3ETwY","1590945","LATAM","Laura Ballesteros","lauraballesteros.chitiva@kodland.team","zoKhcdLtmUcC","создан"],["DFGg0","1603570","LATAM","Jesus Nieves","j.hernandez@kodland.team","OgHwDc5GJ9Gl","создан"],["7B93o","1615229","","Juanita Salazar","","",""],["qkVvs","1614494","LATAM","Juan Valderrama","juan.valderrama@kodland.team","Q0BW9GeKb66h","создан"],["lrhDw","1615701","LATAM","Yeferson Caicedo","s.caicedo218@kodland.team","U1p2outIToyH","создан"],["AKGY7","1615706","","Kevin Cardenas","","",""],["YidVD","1617277","","Vannesa Páez","","",""],["okEpz","1617283","LATAM","Sarah Saltaren","s.saltaren@kodland.team","anbqUh9rnKH3","создан"],["q5t3l","1620313","LATAM","Pablo Barreto","j.pablo.barreto.hernandez@kodland.team","xniSRgHshEhf","создан"],["q44PA","1627101","","Keiber Quintana","","",""],["wmoZi","1630525","","Andres Velandia","","",""],["2QqYs","1636079","","Juan Felipe Zapata","","",""],["wsQ1C","1640048","LATAM","Flavia Licropani","flavia.licropani@kodland.team","T6SVpSYKQNVv","создан"],["KLhuW","1641701","","Carlos Gamboa","","",""],["XgQQc","1652938","LATAM","Angel Chiquiza","juan.chiquiza@kodland.team","QL9ogvdj9jCX","создан"],["OS5cF","1652942","LATAM","Juanita Corredor","juanita.corredor@kodland.team","FycMnVhu2MfE","создан"],["Cpqcq","1658760","","Carlos Jiménez","","",""],["WQvXa","1658766","LATAM","Franco Aguilera","f.aguilera859@kodland.team","va6sbnYWB2fP","создан"],["FoHb7","1660436","LATAM","Antu Almonacid","francisco.cammarata@kodland.team","StTJDy4D1Je1","создан"],["4sNfs","1663830","","Violeta Leguizamon","","",""],["QRvW5","1663838","LATAM","Jazmin Hurtado","a.montenegro.hurtado@kodland.team","uXjAPLf0WZMo","создан"],["NIkrd","1663842","LATAM","Enrique Valencia","c.paez4625@kodland.team","i9hLhBWwCdbe","создан"],["8mT68","1663844","LATAM","Franco Miño","franco.mino@kodland.team","PuI6xj7ahHZF","создан"],["LVy0K","1667041","","Laura Mejia","","",""],["8pRff","1673303","LATAM","Angela Jaramillo","angeladj.barragan@kodland.team","pKJmVFmLckEW","создан"],["hlXL0","1678391","LATAM","Marlon Delgado","m.delgado.lopez@kodland.team","4L86GSwJsv8j","создан"],["pg6ch","1689128","LATAM","Felipe Garces","a.felipe.duque.garces5@kodland.team","qom7zrkT3hPh","создан"],["rp10T","1691462","","Yohary Quiroga","","",""],["fueH9","1691465","LATAM","Sebastian Camacho","j.camacho@kodland.team","Cbhv4hI0kPa6","создан"],["Boa8m","1700566","LATAM","Sandra Rojas","sandra.garcia@kodland.team","XgPqFdA7qGVq","создан"],["l2zMP","1700568","LATAM","Felipe Roa","a.felipe.roa.corredor5@kodland.team","iUkcClqaP7tm","создан"],["pXPnP","1703777","LATAM","Catalina Cuenca","s.catalina.cuenca.alvarez4@kodland.team","irkl15G2CcZP","создан"],["b9WQd","1703779","","Luis Ramos","","",""],["0ZKrJ","1703793","LATAM","Estefanía Téllez","e.sanchez.tellez7@kodland.team","YjfdLmdOZHzl","создан"],["GBMxo","1703798","","Michelle Villela","","",""],["Hgpk9","1713771","LATAM","Dajerly Galindo","jazmin.dajerly.moreno.galindo@kodland.team","JDdBtyW9pvld","создан"],["dD9LO","1723136","","Sofia Diago","","",""],["zxiiv","1723138","LATAM","Nicole Camargo","nicole.camargo@kodland.team","7MTVzrctxkEX","создан"],["UZcD1","1723140","LATAM","Aurora Cunha","a.andrea.da.cunha.alvarez@kodland.team","w1Ro8m09XyKU","создан"],["hhvIg","1732192","LATAM","Dayana Torres","p.towers.mejia@kodland.team","ThCUpu3OtfBB","создан"],["xNjsG","1732196","LATAM","Arturo Corzo","nicolas.corzo.daza@kodland.team","xaHFXHs20UPt","создан"],["6SgcL","1733931","LATAM","Ximena Yate","l.lavao@kodland.team","OX2B3UZ0VOYf","создан"],["zwxKE","1737950","","María José Africano","","",""],["FKrKQ","1737951","","Tania Serna","","",""],["UGTBo","1749477","LATAM","Denilson Pineres","denilson.alfonso.carrascal.pineres@kodland.team","lKfFHlGUL4TV","создан"],["OzSZO","1751640","LATAM","Fernando Rincon","f.rincon1014@kodland.team","OxhvBtlTaAQY","создан"],["rvNQP","1751642","LATAM","David Ceron","w.david.ceron.huertas56@kodland.team","6P7tCT7Bm7xz","создан"],["vRQAl","1755487","","Brayhan Escobar","","",""],["Jg9R3","1757377","","Daniela Diaz","","",""],["DrBVh","1762073","LATAM","Tania Cubides","t.cubides.porez101@kodland.team","tJTwfAitursC","создан"],["XRTbs","1768377","","Sebastian Galindo","","",""],["YswuF","1775898","","Carlos Moreno","","",""],["rLxDA","1775907","LATAM","Mauricio Quiroga","y.hernandez@kodland.team","j6pTLNRO1n9M","создан"],["EecUP","1775918","LATAM","Sonia Cely","s.cely529@kodland.team","d6QEF92trbrk","создан"],["Acsxc","1775920","LATAM","Heidy Briceño","heidy.briceno@kodland.team","mzaD20BqHcZs","создан"],["TGO4R","1775935","","Alison Mora","","",""],["pFV3m","1777132","","Esteban Cano","","",""],["ipiWY","1777135","LATAM","Carlos Bonett","c.bonett719696@kodland.team","wdQwRehjj81F","создан"],["Jbqyd","1784530","LATAM","David Rodriguez","david.santiago.rodriguez.botina@kodland.team","IiSV8HUy3kJQ","создан"],["MS2mG","1786896","LATAM","Yamile Rojas","aylin.yamile.rojas.triana@kodland.team","w1tTc53Ktgto","создан"],["TmRtv","1788403","LATAM","Anny Morelo","anny.carrillo.morelo@kodland.team","p9IWAtWjM2mz","создан"],["0IulS","1796640","LATAM","Juan Medina","juanmedina@kodland.team","8FXfRWKUR0Xf","создан"],["at51A","1800311","","Lina Franco","","",""],["J5Ayh","1800314","LATAM","Haiver Valero","haivermezavalero@kodland.team","JQzdNse12AlG","создан"],["BjAqP","1807753","LATAM","Azalea Cortés","lunazalea.cortes@kodland.team","SZKGtbpmorOO","создан"],["mKafl","1807757","LATAM","Andrés barbosa","a.pardo.barbosa589@kodland.team","gUXKEpUClfoB","создан"],["kP7Lc","1818176","","Daniel Ruiz","","",""],["nBY81","1818197","LATAM","Diana Zapata","d.zapata852@kodland.team","PDLauAQKe3W9","создан"],["UWYkE","1818201","LATAM","Harold Valencia","harold.valencia@kodland.team","Ar6LK3W7756w","создан"],["ldQJY","1818204","LATAM","Brayan Hernandez","brayan.hernandez.gongora@kodland.team","n1T964cl4P3C","создан"],["hrfgA","1818207","LATAM","David Cantillo","juan.cantillo@kodland.team","6t9FFvpPFTow","создан"],["0Y9fu","1818208","LATAM","Geraldine Marín","g.barrantes.marin@kodland.team","EPHCL35LZESo","создан"],["LEg9B","1824141","LATAM","Jennifer Nunez","jennifer.mina.nunez@kodland.team","4Kjaw2WgyHmW","создан"],["4rm6y","1824144","LATAM","Rey Leon","n.rey.leon6239@kodland.team","BJqHuoXRqeWc","создан"],["zQ2tL","1824151","LATAM","Daniel Tijaro","d.omar.tijaro.beltran525@kodland.team","2CYXsejH6EXc","создан"],["8m5ml","1824153","LATAM","Giovanny Bello","j.bello@kodland.team","hoZbbrrkaZUf","создан"],["29KNb","1832149","LATAM","Camila Caicedo","maria.camila.caicedo.heredia@kodland.team","XHycEDM1ZV3g","создан"],["38Z2L","1846163","LATAM","Santiago Guerrero","s.guerrero966@kodland.team","RTthvtZIv4JF","создан"],["KhBgd","1852518","","Arias Rivera","","",""],["lcZ3l","1852528","LATAM","Octavio Rodriguez","octavio.rodriguez@kodland.team","sgQ4nPqgYMYg","создан"],["eoSVz","1852533","LATAM","Melisa Aballay","melisa.aballay@kodland.team","oZK1ahYf3NRR","создан"],["A7W6Y","1003601","LATAM","Jose Alejandro Carrillo","j.carrillo.tellez@kodland.team","jVUAGCyAiG7M","создан"],["wrEod","1859668","LATAM","Ginna Karola","ginna.karola.uasapud.ortega@kodland.team","0iF15G4HhrVL","создан"],["DEJMw","1872578","LATAM","Jhon Jaimes","j.calderon.jaimes@kodland.team","kUjCT3zvsI4A","создан"],["iEMbv","1872595","","José Bueno","","",""],["Hzz2B","1872601","LATAM","Yesid Vargas","yesid.vargas@kodland.team","WvKILLhwDdb8","создан"],["nUE2y","1879746","LATAM","Ezequiel Benitez","d.benitez05@kodland.team","WmC55hR0jiWh","создан"],["MRDtI","1888566","LATAM","Felipe Galvis","andres.felipe.galvis.jimenez@kodland.team","Byw1Yio7Arv7","создан"],["UILfC","1888574","LATAM","Gabriel Dominguez","g.dominguez1@kodland.team","KUaBqUwh8EAW","создан"],["NjTRi","1901762","","Ailin Gonzalez","","",""],["fe6vQ","1900395","","Cesar Prada","","",""],["9nfcr","1901772","","Antonio Vargas","","",""],["Mrxry","1901781","","Estefany Castillo","","",""],["tJLgL","1904207","LATAM","Carolina Montoya","diana.cardona12@kodland.team","kjiZvQIXah2k","создан"],["XdhED","1915669","LATAM","Lina Alarcon","l.maria.nieto.alarcon85@kodland.team","bkjV8IVm4J0u","создан"],["AiuoS","1915676","","Anyi Montes","","",""],["fv27w","1923139","","Jamith Vidal","","",""],["gM3Gb","1923143","LATAM","Julian Fragozo","julian.david.garcia.fragozo@kodland.team","6ndzn9TdSd5w","создан"],["F0sZ6","1923144","LATAM","Giselle Leguizamo","d.giselle.leguizamo.rodriguez5@kodland.team","nUXUfWLBqzRB","создан"],["e0O5S","1923147","LATAM","Lesly Escobar","l.ocampo.escobar@kodland.team","SLsG3THBvgiw","создан"],["588NS","1941060","LATAM","Victor Hugo Lagos Pantoja","v.lagos.pantoja@kodland.team","MUTUSWTuAiTw","создан"],["X83E3","1942620","","Sebastian Luque","","",""],["hXOWE","1941755","LATAM","Robin Rivero","robin.rivero@kodland.team","QhAZFIb0blso","создан"],["Wce1f","1942628","","Jheison Reyes","","",""],["SvS5Q","1945031","","Valentina Giraldo","","",""],["3KkJB","1945034","LATAM","Edwar Jimenez","edwar.jimenez1267@kodland.team","VSpdV7SKNgsv","создан"],["jML7c","1945037","","Nicolas Calderon","","",""],["O6Qfa","1948235","LATAM","Juan David Nieto","juan.avila.nieto@kodland.team","AcxJNRLW2tg8","создан"],["Y9xx9","1948801","LATAM","Lucas Andreetti","l.andreetti@kodland.team","ZIv9K2QmwVje","создан"],["Ti25E","1958863","LATAM","Eliana Rivera","e.rivera7@kodland.team","hfYW5TgjRgH1","создан"],["ctHA0","1970651","LATAM","Alejandro Benitez","alejandro.huerfano.benitez@kodland.team","th8I6YnobIBj","создан"],["JUtdi","1970655","LATAM","Sebastián Beltrán","juan.sebastian.beltran.rodriguez@kodland.team","GpxTe5wELZGl","создан"],["homy4","1975828","LATAM","Jose Granda","j.francsico.granda.ocampo8@kodland.team","YxZ9AcoVkUFW","создан"],["g6Xwx","1975850","LATAM","William Vargas","william.vargas.nino@kodland.team","l5H1iR98qbAj","создан"],["75qyE","1979792","LATAM","Gennier Alarcon","gennier.caro.alarcon@kodland.team","mf0mjf6v3OL2","создан"],["khXLt","1987897","LATAM","Paula Cano","paula.cano12@kodland.team","jyBUyVvKQDs2","создан"],["Srjxx","1987902","LATAM","Guillermo Palacios","luis.giraldo2@kodland.team","bHQmxnw6Vwrh","создан"],["Fuzjw","1987910","LATAM","Nichole Walteros","nichole.walteros@kodland.team","XXaYFlumNWom","создан"],["xrIvc","1987918","","Kevin Beltran","","",""],["eMvuJ","1987919","LATAM","Maria Guzman","m.guzman5@kodland.team","XaFqlGOBHnt0","создан"],["zVZsR","1989819","","Mariana Tinoco","","",""],["6CMq6","1989822","LATAM","Carlos Vargas","c.vargas22@kodland.team","L1Tqspyz1EeV","создан"],["2PquU","1998549","LATAM","Manuel Romo","tito.fajardo@kodland.team","6x5Voj9iBwsi","создан"],["tqVn8","1998553","LATAM","Esther Gonzalez","esther.garzon12@kodland.team","jSwaGoKW8Ral","создан"],["UO7SU","1998557","LATAM","Juan Vallejo","juan.cruz12@kodland.team","KuSftQqestRO","создан"],["RnIQg","1998559","LATAM","Danilza Hurtado","danitza.martinez12@kodland.team","NyFf0NXG5LaN","создан"],["nxnda","1998560","LATAM","Michelle Gosselins","m.gosselins257@kodland.team","1hZLklYvR3us","создан"],["MwPX5","2002398","","Maria Zamora","","",""],["K2V0x","2002402","LATAM","Camilo Valencia","c.camilo.valencia.garcia8599@kodland.team","WvtExTcEdVlc","создан"],["QKmNn","2007929","LATAM","Erika Contreras","erika.bolanos.contreras@kodland.team","x1RgVFOatVd1","создан"],["YfjHG","2007933","LATAM","Juan Andrade","j.c.leguia.andrade@kodland.team","aHclyYGUw3WW","создан"],["aP1MJ","2007937","","Andrea Moreno","","",""],["K7LPi","2014714","LATAM","Sebastian Gomez","luis.gomez.guarama@kodland.team","mvDEmrdUIhHz","создан"],["ahEuO","2014718","LATAM","Jonathan Bayona","j.bayona08@kodland.team","2CuVpTpA7TSJ","создан"],["htKBp","2016238","","Diana Mesa","","",""],["cDPMC","2025847","LATAM","Rosa Rios","r.angelica.romero@kodland.team","5lUyFkvGNfse","создан"],["8DdCT","2025852","LATAM","Camilo Betancourth","camilo.betancourth@kodland.team","MPhHOSjnGYoQ","создан"],["iGBn9","2025856","LATAM","Johmar Martinez","johmar.martinez@kodland.team","v2ISf8EYF2dn","создан"],["k1gw7","2029391","LATAM","Alejandro Ceballos","d.a.ceballos.rodriguez@kodland.team","ILopjXM8qo0l","создан"],["Ean9K","2029400","LATAM","Daniela Nieves","d.nieves.ariza@kodland.team","9mQRxUvoP4pE","создан"],["HdZpd","2038258","LATAM","Adrian Quintana","adrian.quintana.alvarez@kodland.team","omVN7b2MfWJp","создан"],["AmFK7","2038450","LATAM","Nestor Morales","n.morales.martinez11@kodland.team","rXjBCmghDlCX","создан"],["nAFpd","2036696","LATAM","Vanessa Torres","karol.torres.gonzalez@kodland.team","9KMlGbO5UT4M","создан"],["gPigA","2039846","","Johan Caceres","","",""],["rg1ZR","2039862","LATAM","Daniel Nieves","da.nieves.ariza258@kodland.team","kuq5nN5jH7hk","создан"],["gXhtx","2040603","LATAM","Victor Mendez","victor.mendez@kodland.team","rPXdfm4jus6q","создан"],["d0e5G","2041219","LATAM","Nicolas Posada","n.posada.garcia@kodland.team","n5I6GbbhD61H","создан"],["Zcje4","2044131","LATAM","Cristian Ladino","c.ladino.gonzalez@kodland.team","EsTXC2WUYOto","создан"],["lWWdV","2044145","LATAM","Laura Posada","laurap.soriano@kodland.team","epRDsIb2fvXD","создан"],["WgxIW","2044415","LATAM","David Pardo","d.pardo8577@kodland.team","z5NQiPRVGs8e","создан"],["LjTCb","2044418","LATAM","Robinson Molina","r.molina37@kodland.team","0rKRRwFvfLkG","создан"],["IwW9d","2050550","LATAM","Alberto Guerrero","a.guerrero0267@kodland.team","YSmhxzSFLjuu","создан"],["9gyKS","2050554","LATAM","Johan Rendon","johan.rendon@kodland.team","kFKNSeKFlXgd","создан"],["vjsSe","2052182","LATAM","Jaider Paredes","j.paredes627@kodland.team","w1x9A111WEq9","создан"],["9rIw3","2052183","LATAM","Emmanuel Cruz","joan.cruz.lopez@kodland.team","4n8AmhzYOooI","создан"],["uoWx7","2054914","LATAM","Nicole Cardoso","na.cardoso.franco34@kodland.team","0e4e8sfK23P3","создан"],["w3u2D","2057655","","Pablo Ramirez","","",""],["jYuOI","2057668","","Fabian Samudio","","",""],["p7lIQ","2066587","","Bryan Grajales","","",""],["3a7tz","2067688","LATAM","Cristina Lozzo","c.da.lozzo258@kodland.team","GGgnzjG2EEoO","создан"],["ykNgk","2067692","LATAM","Gina Ayala","g.ayala43@kodland.team","Iyfxu8r9rmlY","создан"],["fogDC","2068531","","Miguel Cuellar","","",""],["agDwx","2068532","LATAM","Vanessa Palencia","vc.palencia.de.la.rosa51@kodland.team","Ic0dOOCRJY1x","создан"],["X9EdO","2070963","LATAM","Michael Ortiz","m.ortiz.lozada@kodland.team","7zQbcYBJVMud","создан"],["gQT8N","2071743","","Raquel Guzman","","",""],["2wP3Y","2071746","LATAM","Pedro Santiago","p.luis.lopez856@kodland.team","RUw8o7Idpw5N","создан"],["CtFtU","2087753","LATAM","Viviana Patino","v.patino.epalza@kodland.team","972rxUTEzhe8","создан"],["NAUDa","2087758","LATAM","Maria Zeppa","maria.russo.zeppa@kodland.team","EbrCS0a9KqDb","создан"],["xq1j6","2092782","","Roy Alva","","",""],["07mtE","2094348","LATAM","Dario Martinez","i.martinez.santacruz@kodland.team","5tk09V2GW4r8","создан"],["kMAyB","2094351","LATAM","Bairon Llanos","b.llanos.pelaez@kodland.team","glFlXACI7eMz","создан"],["9yJYA","2094352","","Alejandro Gutierrez","","",""],["NxUVu","2094353","LATAM","Abigail Cabrera","c.alejandra51@kodland.team","ZesC9YeGo69z","создан"],["7eYaZ","2098310","LATAM","Daniela Torres","d.cardona@kodland.team","4EEKUTR2D8SM","создан"],["zyNLE","2098313","LATAM","Walford Archbold","w.archbold.marmol@kodland.team","j5NeavYRzLOA","создан"],["wMKFm","2107808","LATAM","Eduardo Mantilla","e.mantilla.garcia10@kodland.team","ORkGWqaL75lM","создан"],["YwQu3","2107809","LATAM","Juan Urrutia","juan.vasquez.urrutia@kodland.team","g9S8ARRWzdHj","создан"],["3zsiv","2110374","LATAM","Jose Belandria","ja.b.angulo629@kodland.team","pQdrBt2I4eAP","создан"],["YBn60","2112095","","Irvin Silva","","",""],["VLU26","2113761","","Daniela Hernandez","","",""],["yLu20","2113762","LATAM","Selena Quiroga","s.r.quiroga519@kodland.team","HpZecUAQPgHm","создан"],["1iEAn","2116861","LATAM","Omar Dolores","o.tijaro.beltran@kodland.team","otAfATsPr3aP","создан"],["VIXtw","2118210","","Isabella Hernandez","","",""],["TKQeH","2124340","","Luis Hernandez","","",""],["OOc5M","2126281","","Juan Molina","","",""],["SKbJL","2128556","LATAM","Libard Atencia","l.e.a.gutierrez302@kodland.team","pjKtJcuZJ3d1","создан"],["Qrf5A","2131496","","Yesid Guzman","","",""],["9eQm7","2131500","LATAM","Kevin Bolivar","k.bolivar.suarez@kodland.team","kj08RrFzme5G","создан"],["mrwk7","2131503","LATAM","Andres Holguin","a.holguin37@kodland.team","3LzDE91YeIom","создан"],["ZgLhc","2131506","LATAM","Maria Collazos","m.vargas.collazos3@kodland.team","1Kz2vM8JPOK6","создан"],["Y1pFp","2132480","","Valeria Oliveros","","",""],["TjmkX","2146638","LATAM","Andres Pardo","carlospardo.rodriguez@kodland.team","6BSNPhKFJX7p","создан"],["Atqfn","2156203","","Mauricio Ocampo","","",""],["WenWC","2144166","LATAM","Sebastian Mozo","mozo.sebastian.david@kodland.team","ZkazUIdKgZkA","создан"],["ky4Dx","2156227","LATAM","Brandon Villamil","b.villamil.abarracin34@kodland.team","WHZX8kZ4x7eR","создан"],["iPS2Z","2157605","","Gabriela Torres","","",""],["1cDQ1","2157507","","Sebastián Vélez","","",""],["0owxA","2169388","LATAM","Julian Benavides","benavides.julian.mauricio@kodland.team","jYt1cppPALzt","создан"],["rdxKd","2160594","LATAM","Laura Rincon","laura.rincon.carreno@kodland.team","l2sZBjr9xExs","создан"],["bUAsc","2165489","LATAM","Daniela Vargas","d.vargas.suarez11@kodland.team","zsx4EebqGOlx","создан"],["jQR2m","2172457","","Alejandro Hernandez","","",""],["g51kH","2179055","LATAM","Paula Zabala","paula.d.g.zabala1@kodland.team","uXMRypA7BJmc","создан"],["cMKnw","2190409","LATAM","Angélica Beltrán","beltran.angelica12@kodland.team","hitKUUsArNqY","создан"],["SyWK0","2190447","LATAM","Ferley Sierra","gehine.rincon12@kodland.team","MqgQTJ3UTgYd","создан"],["oaYP4","2190464","LATAM","Jose Tobar","j.daniel.tobar.bermudez@kodland.team","ZjTFAJQyqoDP","создан"],["2AQGh","2190470","","Valentina Amezquita","","",""],["HRzGB","2190475","LATAM","Johan Cuellar","johan.manuel.buritica@kodland.team","g9mj6BPTytMU","создан"],["vhKQO","2190482","LATAM","Daniela Muñoz","cardenas.munoz.daniela@kodland.team","GihnvpS4F9VX","создан"],["B08p0","2190520","LATAM","Nicolás Ospina","nicolas.ospina.ramirez@kodland.team","T2V43BAQO0RA","создан"],["jy3qq","2198765","LATAM","Adrian Fuentes","a.fuentes61@kodland.team","imXDZFxgAcZM","создан"],["yFh2C","2207280","LATAM","Santiago Cruz","d.daniel.santiago.cruz.gonzalez2@kodland.team","sZmaBkIs5cQk","создан"],["rgSq1","2207282","","Sebastian Morales","","",""],["euLAG","2234935","","Juliana Ruiz","","",""],["rXlMq","2234938","LATAM","Angie Ramirez","a.ramirez92@kodland.team","ATQDA43lVGhe","создан"],["vTkt3","2234941","","Nestor Valbuena","","",""],["3mnfi","2243075","LATAM","David Galvis","david.stiventh.galvis.vergara@kodland.team","IAyGkOVvBo6t","создан"],["JMkAK","2247363","","Angel Correa","","",""],["ka16F","2247364","LATAM","Cristian Fajardo","cristian.s.f.valencia@kodland.team","xnoAydTCNYth","создан"],["LMzSc","2251748","LATAM","Felipe Zuleta","j.zuleta.moreno@kodland.team","mk3NlKehgvdS","создан"],["LysX6","2266664","LATAM","Felipe Rojas","luis.f.r.perez@kodland.team","Z4XKvZfLvhFO","создан"],["rGzZo","2266621","LATAM","Andrea Salcedo","m.barrera@kodland.team","6xFhAEnunNs3","создан"],["QkTVP","2266646","","Fernando Florez","","",""],["mtQqe","2266673","LATAM","Edwin Sanabria","ecs.torres@kodland.team","cP3F9ZHmaHOM","создан"],["nSc5c","2269535","LATAM","Estefania Rojas","yeimy.albarracin@kodland.team","6h2Yc35rpXnI","создан"],["2UbHi","2269538","LATAM","Juliana Chamorro","j1.marin@kodland.team","5n5XxSrH2lwC","создан"],["st5wx","2269548","","Andres Balaguera","","",""],["Zb6Sn","2269551","","Jose Riascos","","",""],["ZPc0i","2281114","LATAM","Lorena Pulgar","l.andrea.pulgar.velasquez@kodland.team","68LzmqNMCanq","создан"],["FGK0z","2281118","","Isaac Garcia","","",""],["NhhpZ","2293572","LATAM","Marcela Aleman","m.aleman.rojas@kodland.team","anw21hfZvD6N","создан"],["62gL9","2301476","","Loreyn Erazo","","",""],["i5hPy","2304263","LATAM","Cristian Parrasi","c.c.parrasi@kodland.team","8GE1Y9dzjhLR","создан"],["wTf9f","2304266","LATAM","Camilo Rozo","andresgaleano@kodland.team","51FCwbhEjh14","создан"],["RVKaL","2304267","LATAM","Vanessa Castro","v.castro@kodland.team","6tsMAIUXgmFd","создан"],["zsxGb","2304268","LATAM","Thania Bernal","t.perez@kodland.team","RCgTdaiwdv0D","создан"],["nCvqg","2309009","LATAM","Tania Moran","t.v.moran.realpe@kodland.team","ArYRUpn7wnnF","создан"],["cxtc0","2333453","LATAM","Katherine Vanegas","k.vanegas.robayo@kodland.team","NmtAcpAyIvge","создан"],["6LX2k","2315869","LATAM","David Rojas","dsr.paez@kodland.team","9zBBPbnVuc2W","создан"],["GMb1k","2315889","LATAM","Evelyn Galvis","e.zarabanda@kodland.team","sloWUQa3pASB","создан"],["uLwke","2318156","LATAM","Cristian Vasquez","c.d.diaz@kodland.team","LxF9aXXeScmH","создан"],["y5IAD","2318167","","Luisa Hernandez","","",""],["Zm6gX","2333471","LATAM","Aldo Larios","ajl.diaz@kodland.team","qruHNU08KtnN","создан"],["mIBxe","2333473","LATAM","Camilo Monsalve","cac.monsalvei@kodland.team","pw2A0lNz1teV","создан"],["kV4Sb","2333477","LATAM","Miguel Betancur","j.m.betancur.cifuentes@kodland.team","CiRgOYuQut9Z","создан"],["6KGsE","2333483","LATAM","Maria Sacanambuy","maria.sacanambuy@kodland.team","DFFZgEOZdcpm","создан"],["e2srd","2331421","LATAM","Daniela Jimenez","m.d.j.munoz@kodland.team","E0PoMwttW8a9","создан"],["5Atyg","2333507","LATAM","Paola Balaguera","pab.vera@kodland.team","Dll8FDJSfvSy","создан"],["urfva","2333489","","David Herrera","","",""],["b9j64","2333496","LATAM","Nathan Caro","n.s.caro.ferro@kodland.team","yBT1R4mBtP70","создан"],["9MPH7","2340346","","Camila Isaza","","",""],["q0Q2d","2351162","LATAM","Catalina Zapata","c.a.zapata@kodland.team","2PKGfaieO0Bs","создан"],["itn4b","2353357","LATAM","Maria Burbano","mab.santa@kodland.team","2L44pqhXbQSB","создан"],["z7ZSZ","2353362","","Edison Pedraza","","",""],["Yjlqn","2357962","LATAM","Ruben Ramirez","r.e.areiza.ramirez@kodland.team","w6fEOTlTi6qB","создан"],["2jGdJ","2357966","LATAM","Luz Ballesteros","lmb.gomez@kodland.team","4cxpdE99Ogd5","создан"],["hhHwy","2367537","","Michell Alvarado","","",""],["zgPrM","2367541","LATAM","Miguel Avendano","m.e.avendano.hernandez@kodland.team","ZdLSR3q15wUP","создан"],["HxlCQ","2367543","","Cristian Camacho","","",""],["6UJ1t","2367545","","Lizeth Giraldo","","",""],["3Ji2A","2376999","","Camilo Mahecha","","",""],["m0izj","2377007","LATAM","Laura Esteban","lme.maldonado@kodland.team","m2KxLQ0blint","создан"],["PArW1","2377008","LATAM","Juan Baez","juan.sebastian.b.c@kodland.team","c8SjOyxQuPQ9","создан"],["AW7ma","2377010","LATAM","Sebastian Lizarazo","sebastianduarte@kodland.team","j2WqJTNa1g1H","создан"],["uBr2a","2387954","LATAM","Juan Pulido","sebastianariaspulido@kodland.team","KOoDIhMKeTUh","создан"],["s68RG","2387958","LATAM","Angela Quiroz","a.patricia.quiroz.diaz@kodland.team","vq8VtPY8INni","создан"],["RPVo7","2387959","LATAM","Andres Polo","a.f.gonzalez@kodland.team","IVW1Ypv3TJc9","создан"],["OcXVD","2396726","LATAM","Juan Marain","j.marain@kodland.team","UQr3qvQBZfPW","создан"],["XoRwU","2396724","LATAM","Denier Caro","d.tobar@kodland.team","lH6H9vjJFF0s","создан"],["1uLLN","2402315","LATAM","Eduardo Rodriguez","c.eduardo.rodriguez.vallejo@kodland.team","z5vuRzeD2yBm","создан"],["ygJws","2402323","","Isabella Benavides","","",""],["h1ObB","2415051","","Cristina Camacho","","",""],["LIhQT","2415054","LATAM","Juan Leguizamo","j.c.l.rodriguez@kodland.team","hgvlpSpSVM4Q","создан"],["u4OZB","2425420","LATAM","Laura Amador","l.y.amador.rosas@kodland.team","7t3xBbTA4oEi","создан"],["RtmSi","2430168","","Laura Valdes","","",""],["X0SK7","2449113","LATAM","Camila Giraldo","m.mora@kodland.team","Au4HoNUO0SLi","создан"],["D0jJN","2447828","LATAM","Hernan Lopez","h.lopez@kodland.team","qiNpLl0MzjU2","создан"],["tnRpE","2447834","LATAM","Saul Montero","sam.robles@kodland.team","RzL5gsDZAcSr","создан"],["SlmlJ","2457929","LATAM","Alejandro Lopez","a.a.lopez.chacon@kodland.team","Dnvqfphrn8za","создан"],["MzwQK","2460111","LATAM","Linda Bohorquez","lvb.hernandez@kodland.team","KJ0r6QE0eYbs","создан"],["jjGt3","2465770","LATAM","Camilo Florez","ca.zambrano@kodland.team","eheewe4sj1hm","создан"],["mOq17","2475348","LATAM","Johan Pabon","j.pabon@kodland.team","rXv2z9BWMFKC","создан"],["vYF68","2475353","LATAM","Anyi Medina","a.medina@kodland.team","4koqozBiPecw","создан"],["FHJGO","2488290","","Nicolas Castaneda","","",""],["4RZNL","2496614","","Ana Molano","","",""],["kHq9G","2496618","LATAM","Juan Moreno","jsm.arteaga@kodland.team","cOzkHcusqLnK","создан"],["cKbvy","2496627","LATAM","Lina Avila","l.fernanda.avila.cely@kodland.team","k19igjpVm9f1","создан"],["hAz1r","2506837","","Sara Morales","","",""],["llRRV","2510781","","Juan Naranjo","","",""],["sKAAi","2523740","LATAM","Luna Murillo","lvg.murillo@kodland.team","d0X4NpYuZxkM","создан"],["28VYu","2523247","","Jonathan Castellanos","","",""],["s32n4","2525556","LATAM","Stefania Londono","s.o.londono@kodland.team","s8TcPmPVJDoR","создан"],["KXBLh","2525559","","Alejandro Oviedo","","",""],["twmZm","2533717","","Cielo Ocampo","","",""],["0CUbp","2533741","","Maria Hernandez","","",""],["vAzAb","2547002","LATAM","Juan Pablo","j.pablo@kodland.team","w14A4hNjNNbT","создан"],["1Ol8I","2547033","LATAM","Sofia Cuacialpud","s.cuacialpud@kodland.team","HtjwtckNAR2i","создан"],["Wweow","2547041","LATAM","Neyda Caldera","n.caldera@kodland.team","gtQ9jLUyh6li","создан"],["C8xDZ","2559250","LATAM","Luis Bonilla","l.bonilla@kodland.team","GtOzrL3RjDM2","создан"],["RZijh","2562147","LATAM","Juan Mendoza","j.david.mendoza.ropero@kodland.team","8nJcuENGpxfO","создан"],["acNEk","2562159","LATAM","John Uyazan","jau.mayorga@kodland.team","NonaxJ6gQZJy","создан"],["5aOEx","2566088","LATAM","Diego Pedraza","di.perez@kodland.team","IXdWpK1oNREz","создан"],["ikv8c","2566090","","Alvaro Vasquez","","",""],["ylq4A","2574558","LATAM","Maria Pinzon","mpp.lopez@kodland.team","xyvHyYOpVTt1","создан"],["5PYoz","2572472","LATAM","Lesly Sanchez","l.v.sanchez.vesga@kodland.team","Amt7YmJ1XD8Y","создан"],["dh7Cd","2574561","LATAM","Lina Molano","l.escobar@kodland.team","U3WS9BwvMuDh","создан"],["xUGdC","2574562","LATAM","Jolaine Vega","j.de.leon@kodland.team","IbcL1uArE1DL","создан"],["KvueG","2582988","","Ivonne Lemus","","",""],["ooIY7","2582989","LATAM","Daniela Mediorreal","l.nino@kodland.team","75C3usTwCGjP","создан"],["F5YOh","2584613","LATAM","Paola Salazar","pas.gomez@kodland.team","6GCfdb2uR34p","создан"],["dLeSG","2609603","LATAM","Juan Fernandez","j.fernandez@kodland.team","VPiVl1J0coeH","создан"],["R0a4v","2609607","","Santiago Rodriguez","","",""],["q8FuY","2609608","LATAM","Andrea Guerra","an.guerra@kodland.team","bze3TYqGRjLz","создан"],["V5q9d","2609613","","Sebastian Ladino","","",""],["KSYoX","2609616","LATAM","Jessica Torres","j.kerguelen@kodland.team","hPrHIWeoUHvP","создан"],["H4Xpx","2609620","LATAM","Alvaro Lozano","a.cruz@kodland.team","JSMwa5pk66Yl","создан"],["Q5Ic0","2609624","LATAM","Camila Figueredo","mc.figueredo@kodland.team","xL1j49jYTlge","создан"],["8Qw0z","2618807","LATAM","Medina Cesar","c.medina@kodland.team","JxJtoCTaRuh9","создан"],["OndiI","2619680","LATAM","Juan Ocana","j.ocana@kodland.team","h7qkeL2SUaG3","создан"],["qDImf","2619683","LATAM","Yuliana Ituyan","y.ituya@kodland.team","G2mpGyTfS9t0","создан"],["RvqZW","2625040","","Sebastian Castillo","","",""],["1idZr","2626561","LATAM","Andres Rosero","m.a.r.guerrero@kodland.team","wjbNfuYyk0Px","создан"],["y7iMo","2626562","","Avendano Lopez","","",""],["sqOnB","2626670","","Stevin Cordoba","","",""],["owf4m","2634126","LATAM","Milena Murcia","s.murcia@kodland.team","Vz8vjBlcE4Ly","создан"],["i5jdQ","2634127","","Nicolas Uribe","","",""],["TFHEn","2642317","LATAM","Jonathan Velasquez","jfv.realpe@kodland.team","ubxU7di3850B","создан"],["oPhIU","2648413","LATAM","Julian Moreno","ju.moreno@kodland.team","CPH1xNghwPHm","создан"],["UTIzb","2648422","LATAM","Juan Roman","jfp.roman@kodland.team","PUPDul14gTO2","создан"],["aKvdo","2664764","LATAM","David Murillo","d.r.patino.murillo@kodland.team","SfWXlfow8bKF","создан"],["Q3Cms","2664767","LATAM","Belsy Hurtado","b.l.segovia.hurtado@kodland.team","U6CxTzZaLUa9","создан"],["VePIW","2664769","LATAM","Carlos Quinonez","car.quinoznez@kodland.team","IXUThRZPLPWf","создан"],["QRLFq","2687011","LATAM","Juan Pineros","j.c.p.perez@kodland.team","OwamnOTfKZed","создан"],["JPEVr","2677702","LATAM","Yerson Sanchez","y.sanchez.ortiz@kodland.team","mUZkHeZvofrj","создан"],["xYrTy","2687016","LATAM","Jaider Zapata","jaz.osorio@kodland.team","NLkSmSg4t5RK","создан"],["mlaOx","2687019","LATAM","Maryuri Espinosa","m.a.espinosa.gomez@kodland.team","ZpIiFs69FvKQ","создан"],["ogjcV","2687028","LATAM","Juanita Carrillo","gjc.escarraga@kodland.team","Eu9B8M1JjZLw","создан"],["t09Hh","2681094","LATAM","Catalina Santamaria","c.s.suarez@kodland.team","S4fLz2rsBdPu","создан"],["Psc49","2687090","","Vanessa Cano","","",""],["VUDr1","2687093","LATAM","Nathalia Sanchez","na.ramirez@kodland.team","e4MFS4ZFE1ta","создан"],["qYxqw","2698077","LATAM","Jose Bolanos","j.l.bolanos.herrera@kodland.team","cdPDUzcFCxFn","создан"],["VSBxe","2698082","LATAM","Alejandra Caceres","mac.brinez@kodland.team","QF0JigEu1kbU","создан"],["itJmX","2698086","LATAM","Juan Garay","j.d.amaris.garay@kodland.team","6Olxm6OYi71C","создан"],["mhHXU","2698091","LATAM","Juan Grajales","jdg.castillo@kodland.team","NczPXXzBFC7s","создан"],["AicmK","2709723","LATAM","Gabriel Tifaro","g.tifaro@kodland.team","JR6GyA7hGJbs","создан"],["zmtFX","2709728","","Laura Buitrago","","",""],["LJ6Ms","2709737","","Cristian Quenguan","","",""],["fU2l6","2720987","LATAM","Daniel Suarez","dos.mahecha@kodland.team","yHiCO0KkGDrB","создан"],["DHkAT","2725363","","Dailleth Bejarano","","",""],["0RMsw","2725368","","Jesus Jurado","","",""],["mk4Yw","2725371","","Paula Suarez","","",""],["4upZU","2725377","","Juliana Santamaria","","",""],["V8KLL","2725380","","Luz Sanchez","","",""],["CIy9N","2749686","","Juliana Molina","","",""],["aWCoC","2749687","LATAM","Yindry Ascanio","y.ascanio@kodland.team","B7B72b4vWUJP","создан"],["f5q1c","2749690","LATAM","Valentina Rueda","v.rueda@kodland.team","3ejDxAjFJ2Jb","создан"],["XLDGG","2749695","LATAM","Nicolas Fuentes","nicolas.fuentes@kodland.team","UkUTHp0bXX0c","создан"],["xTtqy","2749700","LATAM","Carlos Gonzalez","c.gonzales@kodland.team","qI2X4eEYeZss","создан"],["lRi44","2757690","LATAM","Gina Hurtado","gll.hurtado@kodland.team","SQz0mJ4EIv2o","создан"],["ywDh8","2757694","LATAM","John Sanchez","jfc.sanchez@kodland.team","Aut6B9aoigeJ","создан"],["hiEOl","2757697","LATAM","Vanessa Rodriguez","vkl.rodriguez@kodland.team","lTPaxTVQ2yX0","создан"],["KojT2","2757698","","Bayron Vanegas","","",""],["1cygc","2757702","","Diana Macias","","",""],["GPja9","2757704","LATAM","Ashley Quintero","ayt.quintero@kodland.team","fuhxcZbCgb8K","создан"],["jTPsP","2766339","","Julian Ramirez","","",""],["55Gc4","2775516","LATAM","Carlos Molina","cem.segura@kodland.team","pzZ7OJg8frrB","создан"],["InqPw","2775514","LATAM","Laura Valbuena","l.v.navarrete.valbuena@kodland.team","TBXo73JJUsqw","создан"],["HJGza","2768687","LATAM","Laura Caballero","lac.prada@kodland.team","o3H5MaW1jJRG","создан"],["h6YNh","2775518","LATAM","Kenneth Garcia","kds.garcia@kodland.team","39LiNjAMY11K","создан"],["EX2J6","2781550","LATAM","Maria Pardo","maria.pardo@kodland.team","Y9gLminhM9fu","создан"],["sok1Q","2781556","LATAM","Kimberly Figueroa","knf.zapata@kodland.team","rFkXvPMtySSo","создан"],["H80HA","2785951","","Manuela Montoya","","",""],["AS78b","2785948","LATAM","Sarith Valentina Parada Ramón","svp.ramon@kodland.team","Mu72YhD0OKk1","создан"],["jSKkz","2796575","LATAM","Leidys Milena Arroyo","lma.quinto@kodland.team","MDpJopZHQ6gE","создан"],["ZH2xc","2803549","LATAM","Juan Frasser","jps.frasser@kodland.team","f3b84JyexNqF","создан"],["DGnem","2803553","LATAM","Alejandra Castellanos","m.castellanos@kodland.team","dyKQoAQOb6Je","создан"],["0gu0Y","2803556","","Juan Perdomo","","",""],["DfmR1","2803565","LATAM","Sergio Arciniegas","s.arciniegas@kodland.team","a8sOIcPxkRzW","создан"],["sSWa1","2811216","LATAM","Yarilex Fontalvo Garcia","yarilex.fontalvo@kodland.team","aJKltzDvymhp","создан"],["dDgMq","2814515","LATAM","Catalina Ordonez","catalina.ordonez@kodland.team","QFGTZrXZi1Yw","создан"],["zyVXq","2812340","","Laura Galvis","","",""],["YYx71","2812210","","Ricardo Delgado","","",""],["YwZz4","2814403","LATAM","Karen Hernandez","klh.arias@kodland.team","9HP9RnNul4gg","создан"],["I7UjH","2814518","LATAM","Deisy Ochoa","deisy.ochoa@kodland.team","nrDjXfl68Lfm","создан"],["mI4WB","2814519","LATAM","Diego Llanos","dfl.mondragon@kodland.team","geuvixqtlAzi","создан"],["QcD9z","2814523","LATAM","Julian Rivera","ju.rivera@kodland.team","Y5pBeWAH2GzJ","создан"],["patz7","2822660","LATAM","Alejandra Casallas Torres","ac.torres@kodland.team","EodXfK4MyBTy","создан"],["8pWEs","2822666","LATAM","Daniela Villarraga","daniela.villarraga@kodland.team","4ltTAtkIpNS3","создан"],["EwY73","2824512","LATAM","Melanny Paez","melanny.paez@kodland.team","ViMzPasxyYqh","создан"],["7OEnD","2824515","","Maria Ovalle","","",""],["GMyOy","2830666","","Cristian Ayala","","",""],["chmty","2830670","LATAM","Zharick Alchaer","z.pallares@kodland.team","FgKwSs8Tofzd","создан"],["xlI2K","2827224","","Julian Monroy","","",""],["2nqeV","2839550","","Carlos Riascos","","",""],["yoPBc","2839552","LATAM","Sneider Lozano","j.sneider.lozano.diaz@kodland.team","ogp6Ft14zYbh","создан"],["YXKVk","2841958","","Alejandro Zuniga","","",""],["qu8mK","2841960","","Carlos Rangel","","",""],["UqT5K","2848790","LATAM","Marcos Briceno","m.bricenos@kodland.team","ZT0N1W7VoifN","создан"],["YLv3j","2848793","LATAM","Carlos Arrieta","cjn.arrieta@kodland.team","TgimhLSa9V6R","создан"],["si3hT","2851210","LATAM","Andres Camargo","a.camargo2@kodland.team","LmGbC7ItZIHj","создан"],["ZEp1p","2851766","LATAM","Jessid Paz","j.j.paz@kodland.team","1QMVXHsSh6KU","создан"],["XdUdn","2855582","LATAM","Alejandro Cangrejo","d.cangrejo@kodland.team","55NobzX7Ymro","создан"],["QBJyy","2857231","","Isabella Patarroyo","","",""],["imlRt","2863590","LATAM","Andrey Rojas","was.rojas@kodland.team","rO2Dhbld9wLc","создан"],["Brfi4","2863601","","Juan Rangel","","",""],["0jh2q","2863607","LATAM","Laura Ramirez","l.m.ramirez.pineda@kodland.team","ulhtQMRVB5El","создан"],["UsKUI","2863608","LATAM","Sebastian Clavijo","j.sebastian.clavijo.giraldo@kodland.team","ALqRkZi9JD8t","создан"],["FD54z","2864152","LATAM","David Espitia","d.espitia@kodland.team","aBrzUtm7pPMJ","создан"],["DXf6c","2871256","LATAM","Arnold Valcarcel","ajm.valcarcel@kodland.team","YrsMBimQ4VvL","создан"],["nofnx","2871259","","Ana Cuellar","","",""],["AQtJC","2877105","LATAM","Daniel Zamudio","da.paez@kodland.team","Tb61GXzSpLR7","создан"],["Bkp7a","2877106","LATAM","Saray Orozco","s.orozco1@kodland.team","a0Bjb39Jey4b","создан"],["p8n4C","2881733","LATAM","Andres Sanchez Carrillo","afs.carrillo@kodland.team","zJaWj2m9qlEj","создан"],["dhzTV","2881742","LATAM","Aura Landaeta","a.landaeta@kodland.team","JeUD7VPzPzo2","создан"],["c6eYv","2881744","LATAM","Lina Bernal","l.bernal@kodland.team","4qtMhxT4KrFW","создан"],["4hv8x","2894690","LATAM","Maria Fernanda Hernández Osorio","m.fernanda.hernandez.osorio@kodland.team","NLAmU92tidXZ","создан"],["C1RQl","2894695","","Dayana Sarria","","",""],["0bEZB","2896676","","Federico Arias","","",""],["eGvyo","2896680","LATAM","Ricardo Gutierrez","d.ricardo.gutierrez.buitrago@kodland.team","xDldqCeDBRWo","создан"],["azhpr","2898449","","Jessica Trejos","","",""],["OmzsT","2898452","LATAM","Paula Londono","mpd.londono@kodland.team","WtZbHWuEFZpj","создан"],["UKlSi","2900125","","Valentina Serna","","",""],["TXDWT","2909535","LATAM","Thania Patino","t.patino@kodland.team","Uqw9htZvSOHp","создан"],["t6BkV","2909538","","Paula Garzon","","",""],["ugob0","2917537","LATAM","Alejandra Castaneda","muh.hidayat@kodland.team","GClk8C2aB8cu","создан"],["hXSFL","2930646","LATAM","Juan Barrera","j.d.b.perez@kodland.team","qA6nr1uJPBS2","создан"],["geDQD","2936597","","Sara Rincon","","",""],["3tvJt","2943021","LATAM","Natalia Avila","na.avila@kodland.team","8jYQz9UPbix5","создан"],["e86nN","2943023","LATAM","Gabriel Murcia","gsl.murcia@kodland.team","UAcIZHVuyp5i","создан"],["39lFo","2950514","LATAM","Laura Romero","ljr.ramirez@kodland.team","dUwmvomG9nBs","создан"],["g8yUc","2950530","LATAM","Leidy Amezquita","l.amezquita@kodland.team","jExQKEtHsLse","создан"],["OuA0F","2956080","LATAM","Daniela Rodriguez","dar.hernandez@kodland.team","VsBqBZrJC0n7","создан"],["rB0i5","2956086","LATAM","Cristian Norena","cda.norena@kodland.team","YlU3me9m5QZK","создан"],["iO0fc","2967661","LATAM","Wilson Monsalve","wm.ardila@kodland.team","6bOBXVsx3Idn","создан"],["rKmxK","2969317","LATAM","Juan Pastrana","j.pastrana@kodland.team","fA6fuvMupEie","создан"],["518B5","2969319","LATAM","Juan Clavijo","jjr.clavijo@kodland.team","iLPsVk5TVc1C","создан"],["vNJAe","2972439","LATAM","Santiago Orjuela","sv.orjuela@kodland.team","SKBiZ5KSDUMg","создан"],["8l2Zs","2972306","","Nicol Dayana Ortiz Yara","","",""],["CEvaf","2983678","","Mabel Rios","","",""],["zwkCt","2983680","LATAM","Natalia Zapata","n.zapatamartinez@kodland.team","iilDKJRM9P6S","создан"],["prWwY","2983682","","Sergi Lozano","","",""],["mkVxX","2983683","LATAM","Nicolas Lopez","n.david.lopez.toloza@kodland.team","awbdZ1MfYfz7","создан"],["RN0PZ","2983684","LATAM","Daniela Castano","dag.castano@kodland.team","e2DaV4VZHMGp","создан"],["hWdpN","2983266","LATAM","Luz Zaparan","l.marina.zaparan.cardona@kodland.team","LHyNtLuqs3Tv","создан"],["CNHyw","2983685","LATAM","Julian Mahecha","j.mahecha@kodland.team","l3fdaeujpvQN","создан"],["H2mKl","2989854","LATAM","Leila Casenaves","l.casenaves@kodland.team","j1yEUmX3xzWS","создан"],["1mJOd","3000954","LATAM","Alejandro Gil Ordoñez","ag.ordonez@kodland.team","Y1gR8JFUEB7m","создан"],["bNzwv","3000819","LATAM","Esteban Delgado Urrego","e.delgado.urrego@kodland.team","EPzyjF8aPpUv","создан"],["ltbny","3000948","LATAM","Santiago Osorio Granobles","s.osorio.granobles@kodland.team","7fAbWSK8Zn1L","создан"],["QDZoH","3009157","LATAM","Marlon Alfonso","m.david.beltran.alfonso@kodland.team","82LCJOEVvdhO","создан"],["O9S5l","3006513","","Daniel Pazmiño","","",""],["dXPht","3009158","LATAM","Omar Guzman","o.garciaguzman@kodland.team","rlE7SQyOJONp","создан"],["9e7EV","3017703","","Nathalia Rojas","","",""],["0YjIw","3017704","LATAM","Jhon Ladino","j.esteban.rodriguez.ladino@kodland.team","EKDxVddSnRY8","создан"],["CJUOf","3020436","","Victor Perez","","",""],["5tyS7","3020440","LATAM","Cristian Susa","c.susa@kodland.team","96pSLbZREOBa","создан"],["2OPvI","3031115","LATAM","Felipe Jaramillo","f.jaramillo@kodland.team","O7RCuHpYmfQY","создан"],["r71TA","3034156","","Julian Bayona","","",""],["TPjPV","3035377","","Nohora Cardenas","","",""],["Pu0RX","3042005","LATAM","Mariana Gonzalez","m.paola.gonzalez.ramos@kodland.team","vDcnImf6s3hQ","создан"],["VB7Ao","3042009","LATAM","Dahiana Collazos","d.alexandra.pena.collazos@kodland.team","8Yb44z7XHxC6","создан"],["Dq6DZ","3046640","LATAM","Yahira Pertuz","y.pertuz@kodland.team","bh33AchB8xkE","создан"],["oXNR7","3051781","LATAM","Diego Rodriguez","j.rodriguezvelasquez@kodland.team","IbfIYSlYFYrf","создан"],["Rdj8y","3051784","LATAM","Sebastian Florez","s.florez@kodland.team","f00PBIGj3GJB","создан"],["DVQ84","3051789","LATAM","Juan Jimenez","j.martinezjimenez@kodland.team","30YXkS6BUmi6","создан"],["grcHs","3050326","LATAM","Hanna Narvaez","h.narvaezrodriguez@kodland.team","dKqJIzRsxga2","создан"],["x2eaX","3051797","LATAM","Silvia Munoz","silvia.munoz@kodland.team","0CTvBfwhXyiG","создан"],["J1q2T","3057973","","Bayron Aguilera","","",""],["dHq8Q","3057975","LATAM","Paula Rueda","p.rueda@kodland.team","HRYMVbghQJB1","создан"],["d99xJ","3067136","LATAM","Juan Diaz","j.diazgarcia@kodland.team","QnaafBhe9PKi","создан"],["AmEJq","3057983","LATAM","Diana Rave","d.lararave@kodland.team","g9rqv8t2bwRu","создан"],["GiCC2","3067143","LATAM","Rafael Camargo","r.camargo@kodland.team","chVgqwRlxllE","создан"],["TRXJw","3067151","","Pablo Chiesa","","",""],["8szUR","3079284","","Natalia Hurtado","","",""],["u9qdT","3079286","","Diego Alvarrasin","","",""],["mAeRH","3079290","","Acero Herrera","","",""],["d6Z6n","3079291","LATAM","Valeria Pabon","vde.pabon@kodland.team","HSjLbRINAJPy","создан"],["Xz1te","3079293","LATAM","Diana Catama","di.bernal@kodland.team","tBJ3rJcmc8qt","создан"],["z4Ki7","3105724","LATAM","Andres Obando","an.barriga@kodland.team","COrMIXpFslsX","создан"],["JvvIL","3082784","LATAM","Oscar Velasquez","o.salcedovelazquez@kodland.team","dGSf8aYmlCdf","создан"],["6g9gg","3083156","LATAM","Sebastian Herrera","s.herrera@kodland.team","omQWNmvspgvq","создан"],["1Jzd3","3084878","LATAM","Tatiana Munoz","t.castilla@kodland.team","a2312Tjt4zUf","создан"],["iJDPH","3095788","","Camilo Farfan","","",""],["129zR","3095794","","Maria Peralta","","",""],["iHJSO","3095802","LATAM","Andres Vanegas","an.vanegas@kodland.team","a000k2M50GIk","создан"],["i8Clc","3095806","LATAM","Emily Malagon","e.malagon@kodland.team","lPxizJkFVQIW","создан"],["yRlwk","3095810","LATAM","Juan Arcila Giraldo","ju.giraldo@kodland.team","fgG1Ta2XVewo","создан"],["6wSHU","3097584","LATAM","Miguel Rojas","mi.rojas@kodland.team","umVnNCxEbhy8","создан"],["huUGK","3097588","LATAM","Camila Gonzalez","c.gonzalez@kodland.team","vbwy3a1asRcw","создан"],["7KGic","3105727","LATAM","Juanita Bejarano","ju.bejarano@kodland.team","DU7toGRznGoD","создан"],["70yDr","3105729","","Luisa Tolosa","","",""],["dLCFm","3115664","","Jhonatan Viera","","",""],["ecM17","3117555","LATAM","Daniel Quijije","d.guaranda.quijije@kodland.team","Z8etGVSxtMZJ","создан"],["tN6F9","3117561","LATAM","Paola Castaneda","p.castaneda@kodland.team","1fmNGvSqv8CE","создан"],["5GXZF","3124104","LATAM","Breyner Sanchez","b.alejandro.sanchez.quintero@kodland.team","VLhddIBNXWPO","создан"],["m5oKX","3124107","","Juan Valencia","","",""],["wCJSo","3124110","","Nathaly Sarmiento","","",""],["bo9LI","3124115","","Diego Garcia","","",""],["aOpEl","3124116","LATAM","Juan Zemanate","j.zemanate@kodland.team","BcQNY9Zhr8wH","создан"],["76bvF","3127712","LATAM","Julian Ayala","j.ayala@kodland.team","1FXVzaajSTwY","создан"],["rC4jp","3127715","LATAM","Diego Zapata","m.zapata@kodland.team","rI9yGlPNAgxg","создан"],["D9gm9","3127718","LATAM","Andres Sarmiento","andres.sarmiento@kodland.team","FTaZK0GFViiL","создан"],["6K8So","3127722","LATAM","Sara Velasquez","s.velasquez@kodland.team","h0IdMyzsAgHa","создан"],["AlLOr","3127723","LATAM","Luna Leon","l.carolina.bolanos.leon@kodland.team","dFujqixUEakj","создан"],["u96Sb","3129532","","Alison Sango","","",""],["pcWrz","3129539","LATAM","Nicole Murcia","n.murcia@kodland.team","XGA1LKHqp8wl","создан"],["MEWyz","3139434","","Ariel Vera","","",""],["Ea0eg","3139436","","Frank Celis","","",""],["OakAG","3141392","LATAM","Fabio Montenegro","f.tarazona@kodland.team","PpkhUmZY2uim","создан"],["t8GSi","3143593","LATAM","Juan Duenas","ju.becerra@kodland.team","mW7MGy47pfrQ","создан"],["f238x","3143660","LATAM","David Quijano","da.obando@kodland.team","CiIU6UQf5d6b","создан"],["LyaJJ","3143661","LATAM","Camilo Galan","ca.osorio@kodland.team","OI5MY1V8aaAi","создан"],["C9cgZ","3147408","","Johan Rojas","","",""],["DGv8h","3147427","LATAM","Jonathan Espin","jo.tipantuna@kodland.team","yCG0QI6AISnh","создан"],["Cy8us","3147432","LATAM","Juan Munoz","j.david.munoz.eslava@kodland.team","9BgE3y2Pjbhs","создан"],["8H40Q","3147434","LATAM","Laura Valencia","l.camila.valencia.nino@kodland.team","xHIUeCkBKwIj","создан"],["TxWL4","3147439","","Estefania Lopez","","",""],["z81T9","3147446","LATAM","Mauricio Moreno","ma.moreno@kodland.team","YDX3DW1ejh3h","создан"],["9YocD","3149606","LATAM","Angela Hurtado","an.nunez@kodland.team","zQ7c0oW9ehln","создан"],["Y5Hta","3166281","LATAM","Sebastian Gravini","ju.contreras@kodland.team","Jt94B3hjNm2s","создан"],["vhsU3","3159333","LATAM","Sebastián Villota Gomez","se.gomez@kodland.team","mHX9hPmfyPX3","создан"],["dnuoW","3182542","","Karla Valverde","","",""],["gOtZw","3185442","LATAM","Brayan Ardila","b.mauricio.ardila.cardenas@kodland.team","loiapZnQ9nra","создан"],["q0rZa","3185448","LATAM","Julián Nino","j.antonio.nino.gomez@kodland.team","9qgcAg9kgQrb","создан"],["odgv5","3185454","LATAM","Jesus Cifuentes","j.rozo@kodland.team","1oGZ2TbcpK0H","создан"],["d9UZj","3200243","","Laura Leon","","",""],["G4rd1","3200260","LATAM","Cristian Holguin","cr.castaneda@kodland.team","8b910mR5Dvv8","создан"],["c2O5s","3200266","LATAM","Juliana Loaiza","j.loaiza.mejia@kodland.team","C8BadfiVdrLA","создан"],["LUQt8","3200281","LATAM","Diego Peña","di.vera@kodland.team","LPi7mTvY9XP6","создан"],["Hkq3e","3200294","","Guillermo Gamboa ","","",""],["Rr2OL","3200304","LATAM","Alejandra Gil","m.alejandra.gil.arenas@kodland.team","bqm8MHSWk2SL","создан"],["2LB5E","3200316","LATAM","Lady Castiblanco","la.vargas@kodland.team","Hcxuh7UjmgaU","создан"],["InmMo","3200345","LATAM","Angie Sora","an.rodriguez@kodland.team","vdYzGq6egCmb","создан"],["YDo0u","3214860","LATAM","Juliana Giraldo","j.ibanez@kodland.team","6NeCOSFmLLoW","создан"],["K2r6N","3214864","LATAM","Natalia Fuquene","n.fuquene@kodland.team","g4mopmWH1H3V","создан"],["z1qna","3214867","","Daniel Holguin","","",""],["pO72Y","3214873","LATAM","Julian Barreto","j.tejada@kodland.team","z8rDbstfywka","создан"],["56gUx","3214878","LATAM","Francisco Puente","fr.puente@kodland.team","CqgBA2hTdjdb","создан"],["VN2YU","3214893","LATAM","Javier Arteaga","ja.arroyo@kodland.team","mgdYDkxGI5zw","создан"],["KPP7l","3214902","LATAM","Juan Barrios","ju.rodriguez@kodland.team","v6rBx67gtaEY","создан"],["fzoDb","3214905","","Sebastian Fernandez","","",""],["T6wSy","3214909","","Cristian Alvarado","","",""],["caNj2","3231744","","Juan Peña","","",""],["miLwm","3231750","LATAM","Daniel Criollo","d.criollo@kodland.team","i0W6Isu51fnl","создан"],["lskCo","3231754","","Niray Sanchez","","",""],["F2s2R","3231759","","Adolfo Lobmeyr","","",""],["na3hB","3231764","","Erick Robayo","","",""],["sSQc3","3231770","LATAM","Manuel Restrepo","ma.londono@kodland.team","2ExDORbZqveJ","создан"],["fAsBf","3231775","","Mishell Gómez","","",""],["bHjkS","3231783","LATAM","Joan Trejos","j.marulanda@kodland.team","qfiN9lXfUpls","создан"],["lgwsQ","3231789","LATAM","Juan Zarama","j.erazo@kodland.team","AAeR1s5f24rD","создан"],["kthFl","3231808","LATAM","Juan Gonzalez","ju.rios@kodland.team","1HsSK2UJIZ2p","создан"],["JaqhB","3231844","LATAM","Antonio Betancourt","a.reina@kodland.team","ZrHcLk64pNqB","создан"],["xCmIZ","3231865","LATAM","Mayra Muneton","m.villegas@kodland.team","JHxiQZDF1WeR","создан"],["oYQuR","3247181","LATAM","Samuel Guzman","s.citalan@kodland.team","uu2DCXJe0j59","создан"],["3yavE","3247184","LATAM","Soledad Celleri","s.celleri@kodland.team","TalVEip9AmSh","создан"],["RjYoM","3247188","LATAM","Juan Murcia","j.gutierrez@kodland.team","9BPQgBKKjz4X","создан"],["u2svL","3247197","LATAM","Joan Villamil","jo.prado@kodland.team","m6SFCm5y75qP","создан"],["ALzMw","3247201","LATAM","Brayan López","b.lopez@kodland.team","0eTSNRbp39CJ","создан"],["z6Vmp","3247207","LATAM","Andres Sanchez","a.espinel@kodland.team","AUf6PY4PNWw8","создан"],["AIiM0","3247214","LATAM","Ricardo Giraldo","j.loaiza@kodland.team","bg1k2CqTNXkR","создан"],["sIuxe","3247225","LATAM","Nathan Olmos","n.herazo@kodland.team","9Zt8yWM8Xfne","создан"],["EWdlI","3247227","","Jhon Reyes","","",""],["tFByw","3263951","LATAM","Duvan Rodríguez","d.suarez@kodland.team","sZASQTt3ellP","создан"],["TsZYA","3263957","LATAM","Darwin Gonzalez","da.gonzalez@kodland.team","0NAmFTdNE3Li","создан"],["QTaQp","3263982","","Dayan Bohorquez","","",""],["E8c7e","3263985","LATAM","Víctor Mueses","v.charfuelan@kodland.team","Acch294W1IA5","создан"],["hOvIF","3296798","LATAM","Oriana Cardenas","o.diaz@kodland.team","wUJ520sUp5mG","создан"],["R0q0Z","3298147","LATAM","Sebastián Villota","s.romo@kodland.team","gtH6PP0VVDjX","создан"],["PKazA","3318930","","Felipe Quirola","","",""],["8OyOu","3336222","LATAM","Steven Riveros","st.riveros@kodland.team","G1Livyk1IN2a","создан"],["mqugY","3336229","LATAM","Sebastián Builes","s.ortiz@kodland.team","bZFGcxA63Rmb","создан"],["9J295","3336232","LATAM","Israel Párraga","l.arevalo@kodland.team","4pSWCRZGDoNh","создан"],["FD7Zf","3336237","","Ruddy Gil ","","",""],["gqIGh","3353990","LATAM","Maria Olivero","m.mahecha@kodland.team","gPK5Q1XADYT7","создан"],["jX022","3354009","LATAM","Laura López","l.aristizabal@kodland.team","R8LGWYkjJZTc","создан"],["cvS7K","3354869","LATAM","Karen Bravo","k.rodrguez@kodland.team","8oZjfYKxwNPH","создан"],["YDrQ0","3354875","LATAM","Daniel Figueroa","d.olmedo@kodland.team","2HrEnXjevfXM","создан"],["ORDiC","3368309","LATAM","Alejandra Alvarado","a.avila@kodland.team","dMG9veZAVrd5","создан"],["MDHD2","3368326","LATAM","David Paccha","d.gallegos@kodland.team","DzkGen0tnMTl","создан"],["AWzwu","3395957","LATAM","Sandra Urrea","s.vargas@kodland.team","FpePIouFPf43","создан"],["PzmXk","3385854","","Juan Camilo Valencia","","",""],["E8vCs","3395976","","Emmanuel Mejia","","",""],["ihNpU","3395983","LATAM","Wilfram Rocha","w.rocha@kodland.team","JL2H4KfoQqGP","создан"],["BJRLV","3395988","LATAM","Juan Camargo","j.espinosa@kodland.team","AnodUs1Qrnwu","создан"],["sHMvT","3395996","LATAM","Angie Acosta","angie.rodriguez@kodland.team","nPN08IpPTDZM","создан"],["RkW22","3400478","LATAM","Jhon Alexander Aranda","j.santacruz@kodland.team","0OztCnZDXAMT","создан"],["q2VZ0","3404639","","Andrés Ortiz","","",""],["q7fbz","3429394","LATAM","Matthew Almeida","ma.almeida@kodland.team","oP26J580RdF7","создан"],["NIMbR","3429404","LATAM","Andres Urrego","a.diaz@kodland.team","D9P2ioDy2kpr","создан"],["w8ZM7","3436414","LATAM","Santiago Perez","sa.perez@kodland.team","lKdCieTePAE7","создан"],["fD7Da","3436417","LATAM","Danna Lozano","d.caselles@kodland.team","blT2Ea3HUc2U","создан"],["1uHL8","3436423","LATAM","Jonathan Barrios","jo.contreras@kodland.team","pFfFVslROhBp","создан"],["01mwW","3436428","LATAM","Kaleth Cristancho","k.alandette@kodland.team","yE5IY2BTw3o4","создан"],["496Es","3448263","LATAM","Danna Ruiz","danna.rodriguez@kodland.team","8Vx2fxhJQWgV","создан"]];
+  // columns: [loginPw, id, branch, name, email, password, status]
+  const index = {};
+  for (const row of DATA){ index[row[0]] = row; }
+
+  const input = document.getElementById('teacherId');
+  const btn = document.getElementById('searchBtn');
+  const resultEl = document.getElementById('result');
+  const emptyEl = document.getElementById('emptyState');
+  const feedbackEl = document.getElementById('feedback');
+
+  // --- Puerta de acceso ---
+  const GATE_PASSWORD = "Kod@2026AjQ3";
+  const gateHeader = document.getElementById('gateHeader');
+  const searchHeader = document.getElementById('searchHeader');
+  const gateCard = document.getElementById('gateCard');
+  const searchCard = document.getElementById('searchCard');
+  const gatePasswordInput = document.getElementById('gatePassword');
+  const gateBtn = document.getElementById('gateBtn');
+  const gateFeedback = document.getElementById('gateFeedback');
+
+  function unlock(){
+    gateHeader.style.display = 'none';
+    searchHeader.style.display = 'block';
+    gateCard.style.display = 'none';
+    searchCard.style.display = 'block';
+    searchCard.classList.add('fade-in');
+    searchHeader.classList.add('fade-in');
+    input.focus();
+  }
+
+  function tryUnlock(){
+    const value = gatePasswordInput.value;
+    if(value === GATE_PASSWORD){
+      unlock();
+    } else {
+      gateFeedback.textContent = 'Clave incorrecta. Verifica con tu coordinador.';
+      gatePasswordInput.classList.remove('shake'); void gatePasswordInput.offsetWidth; gatePasswordInput.classList.add('shake');
+      gatePasswordInput.value = '';
+      gatePasswordInput.focus();
+    }
+  }
+
+  gateBtn.addEventListener('click', tryUnlock);
+  gatePasswordInput.addEventListener('keydown', (e) => { if(e.key === 'Enter') tryUnlock(); });
+  gatePasswordInput.addEventListener('input', () => {
+    gatePasswordInput.classList.remove('shake');
+    gateFeedback.textContent = '';
+  });
+
+  const branchNames = {
+    BRAZIL:'Brasil', USA:'Estados Unidos', GCC:'Golfo (GCC)', INDONESIA:'Indonesia',
+    CIS:'CEI', LATAM:'Latinoamérica', MENA:'MENA', ENG:'Inglaterra', POLAND:'Polonia', ITALY:'Italia'
+  };
+
+  function initials(name){
+    const parts = name.trim().split(/\s+/).filter(Boolean);
+    if(parts.length === 0) return '?';
+    if(parts.length === 1) return parts[0][0].toUpperCase();
+    return (parts[0][0] + parts[1][0]).toUpperCase();
+  }
+
+  function escapeHtml(str){
+    return String(str).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  }
+
+  function render(row){
+    const [loginPw, id, branch, name, email, password, status] = row;
+    const branchLabel = branch ? (branchNames[branch] || branch) : 'Sede no disponible';
+    const hasEmail = !!email;
+    const hasPw = !!password;
+
+    const emailRowHtml = hasEmail ? `
+          <div class="field">
+            <div class="k">CORREO</div>
+            <div class="v-row">
+              <div class="v">${escapeHtml(email)}</div>
+              <button class="copy-btn" data-copy="${escapeHtml(email)}" title="Copiar correo">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v1"/></svg>
+              </button>
+            </div>
+          </div>` : `
+          <div class="field">
+            <div class="k">CORREO</div>
+            <div class="v-row"><div class="v" style="color:var(--ink-500);font-weight:600;">No disponible — contacta a tu coordinador</div></div>
+          </div>`;
+
+    const pwRowHtml = hasPw ? `
+          <div class="field pw">
+            <div class="k">CONTRASEÑA DE PLATAFORMA</div>
+            <div class="v-row">
+              <div class="v" data-pw="${escapeHtml(password)}">••••••••••••</div>
+              <button class="eye-btn" title="Mostrar / ocultar">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg>
+              </button>
+              <button class="copy-btn" data-copy="${escapeHtml(password)}" title="Copiar contraseña">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v1"/></svg>
+              </button>
+            </div>
+          </div>` : `
+          <div class="field pw">
+            <div class="k">CONTRASEÑA DE PLATAFORMA</div>
+            <div class="v-row"><div class="v" style="color:var(--ink-500);font-weight:600;">No disponible — contacta a tu coordinador</div></div>
+          </div>`;
+
+    resultEl.innerHTML = `
+      <div class="result-card">
+        <div class="result-head">
+          <div class="avatar-badge">${escapeHtml(initials(name))}</div>
+          <div class="who">
+            <h2>${escapeHtml(name)}</h2>
+            <div class="branch-line">${escapeHtml(branchLabel)}</div>
+          </div>
+          <div class="status-pill"><span class="dot"></span>Cuenta activa</div>
+        </div>
+        <div class="field-list">
+          <div class="field">
+            <div class="k">TEACHER ID</div>
+            <div class="v-row">
+              <div class="v">${escapeHtml(id)}</div>
+              <span class="id-tag">ID</span>
+            </div>
+          </div>
+          ${emailRowHtml}
+          ${pwRowHtml}
+        </div>
+      </div>
+    `;
+    resultEl.style.display = 'block';
+    emptyEl.style.display = 'none';
+
+    // wire eye toggle
+    const eyeBtn = resultEl.querySelector('.eye-btn');
+    const pwEl = resultEl.querySelector('[data-pw]');
+    if(eyeBtn && pwEl){
+      let shown = false;
+      eyeBtn.addEventListener('click', () => {
+        shown = !shown;
+        pwEl.textContent = shown ? pwEl.getAttribute('data-pw') : '••••••••••••';
+      });
+    }
+
+    // wire copy buttons
+    resultEl.querySelectorAll('.copy-btn').forEach(cb => {
+      cb.addEventListener('click', async () => {
+        const text = cb.getAttribute('data-copy');
+        try{
+          await navigator.clipboard.writeText(text);
+        }catch(e){
+          const ta = document.createElement('textarea');
+          ta.value = text; document.body.appendChild(ta); ta.select();
+          document.execCommand('copy'); document.body.removeChild(ta);
+        }
+        cb.classList.add('copied');
+        const original = cb.innerHTML;
+        cb.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M20 6L9 17l-5-5"/></svg>`;
+        setTimeout(() => { cb.classList.remove('copied'); cb.innerHTML = original; }, 1200);
+      });
+    });
+  }
+
+  function doSearch(){
+    const raw = input.value.trim();
+    feedbackEl.textContent = '';
+    if(!raw){
+      feedbackEl.textContent = 'Escribe tu contraseña personal para continuar.';
+      input.classList.remove('shake'); void input.offsetWidth; input.classList.add('shake');
+      resultEl.style.display = 'none';
+      emptyEl.style.display = 'none';
+      return;
+    }
+    const row = index[raw];
+    if(row){
+      render(row);
+    } else {
+      resultEl.style.display = 'none';
+      emptyEl.style.display = 'block';
+    }
+  }
+
+  btn.addEventListener('click', doSearch);
+  input.addEventListener('keydown', (e) => { if(e.key === 'Enter') doSearch(); });
+  input.addEventListener('input', () => {
+    input.classList.remove('shake');
+  });
+</script>
+</body>
+</html>
